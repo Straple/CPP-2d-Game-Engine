@@ -20,7 +20,6 @@ void draw_pixels(u32 x0, u32 y0, u32 x1, u32 y1, const Color& color) {
 			}
 		}
 		else {
-			const point_t inv_alpha = 1 - color.a;
 			for (u32 y = y0; y < y1; y++) {
 				Color* pixel = row + x0;
 				for (u32 x = x0; x < x1; x++, pixel++) {
@@ -68,62 +67,76 @@ void draw_rect(dot pos, dot half_size, const Color& color) {
 	draw_rect_in_pixels(x0, y0, x1, y1, color);
 }
 
-//#include<queue>
-
 void draw_circle(dot pos, point_t radius, const Color& color) {
-
-	/*std::vector<std::vector<bool>> Vis(render_state.height, std::vector<bool>(render_state.width));
-
-	std::queue<std::pair<s32, s32>> Q;
-	Q.push(std::make_pair(clamp<s32>(0, (pos.x + arena_half_size.x) * scale_factor, render_state.width - 1), clamp<s32>(0, (pos.y + arena_half_size.y) * scale_factor, render_state.height - 1)));
-
-	while (!Q.empty()) {
-		s32 x, y;
-		x = Q.front().first;
-		y = Q.front().second;
-
-		Q.pop();
-
-		if (!(is_between<s32>(0, x, render_state.width - 1) && is_between<s32>(0, y, render_state.height - 1))) {
-			continue;
-		}
-		if (Vis[y][x]) {
-			continue;
-		}
-
-		Vis[y][x] = true;
-
-		dot p = dot(x, y) / scale_factor - arena_half_size;
-
-		if ((p - pos).getLen() <= radius) {
-			render_state.render_memory[y * render_state.width + x] = render_state.render_memory[y * render_state.width + x].combine(color);
-
-			
-			Q.push(std::make_pair(x, y + 1));
-			Q.push(std::make_pair(x, y - 1));
-			Q.push(std::make_pair(x + 1, y));
-			Q.push(std::make_pair(x - 1, y));
-		}
-	}*/
-
-	s32 left_x = clamp<s32>(0, (pos.x + arena_half_size.x - radius) * scale_factor, render_state.width);
-	s32 right_x = clamp<s32>(0, (pos.x + arena_half_size.x + radius) * scale_factor, render_state.width - 1);
 
 	s32 top_y = clamp<s32>(0, (pos.y + arena_half_size.y - radius) * scale_factor, render_state.height);
 	s32 bottom_y = clamp<s32>(0, (pos.y + arena_half_size.y + radius) * scale_factor, render_state.height - 1);
 
+
+	s32 left_x = (pos.x + arena_half_size.x - radius) * scale_factor;
+	s32 right_x = (pos.x + arena_half_size.x + radius) * scale_factor;
+	s32 mid_x = (left_x + right_x) / 2;
+
+	left_x = clamp<s32>(0, left_x, render_state.width);
+	right_x = clamp<s32>(0, right_x, render_state.width - 1);
+
+
+	s32 lfx = left_x;
+	s32 rfx = right_x;
+
+	Color* row = render_state.render_memory + top_y * render_state.width;
+
 	for (s32 y = top_y; y <= bottom_y; y++) {
-		s32 cur_left_x = left_x;
-		s32 cur_right_x = right_x;
 
-		for (s32 x = cur_left_x; x <= cur_right_x; x++) {
-
+		auto verify = [&](s32 x) -> bool {
 			dot p = dot(x, y) / scale_factor - arena_half_size;
 
-			if ((p - pos).getLen() <= radius) {
-				render_state.render_memory[y * render_state.width + x] = render_state.render_memory[y * render_state.width + x].combine(color);
+			return (p - pos).getLen() <= radius;
+		};
+
+		// relax border
+		{
+			if (verify(lfx)) {
+
+				while (lfx >= left_x && verify(lfx)) {
+					lfx--;
+				}
+				lfx++;
+			}
+			else {
+
+				while (lfx <= mid_x && !verify(lfx)) {
+					lfx++;
+				}
+				lfx--;
+			}
+
+			if (!verify(rfx)) {
+
+				while (rfx >= mid_x && !verify(rfx)) {
+					rfx--;
+				}
+				rfx++;
+			}
+			else {
+
+				while (rfx <= right_x && verify(rfx)) {
+					rfx++;
+				}
+				rfx--;
 			}
 		}
+
+		//draw_rect_in_pixels(lfx, y, lfx + 2, y + 1, 0xffffff);
+		//draw_rect_in_pixels(rfx, y, rfx + 2, y + 1, 0x000000);
+
+		
+		for (s32 x = lfx; x <= rfx; x++) {
+
+			row[x] = row[x].combine(color);
+		}
+
+		row += render_state.width;
 	}
 }
 

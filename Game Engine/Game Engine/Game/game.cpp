@@ -57,7 +57,7 @@ void simulate_game(Input& input, point_t delta_time) {
 	camera.simulate(player.pos, delta_time);
 
 	if (is_down(BUTTON_MOUSE_L)) {
-		draw_circle(mouse.pos, 50, Color(0xff0000, 128));
+		draw_circle(mouse.pos, 40, Color(0xff0000, 128));
 	}
 
 	if (is_down(BUTTON_MOUSE_R)) {

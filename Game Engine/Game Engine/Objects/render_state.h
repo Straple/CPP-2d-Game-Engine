@@ -6,10 +6,7 @@
 struct Render_state {
     u32 height, width;
 
-    //quad_tree_render tree;
-
     Color* render_memory; // память для рендера
-    //u32* memory;
 
     BITMAPINFO bitmap_info;
 
@@ -22,13 +19,9 @@ struct Render_state {
         {
             if (render_memory) {
                 delete[] render_memory;
-                //delete[] memory;
             }
             u64 size = static_cast<u64>(width) * height;
             render_memory = new Color[size];
-            //memory = new u32[size];
-
-            //tree.resize(height, width);
         }
 
         // релаксация bmiHeader

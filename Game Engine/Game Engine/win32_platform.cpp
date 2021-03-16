@@ -143,6 +143,7 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		running = false;
 	} break;
 
+	case WM_MOVING:
 	case WM_SIZE: {
 
 		// взятие размеров окна
@@ -172,11 +173,11 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 int main() {
 
 	//скрывает консоль
-	ShowWindow(GetConsoleWindow(), HIDE_WINDOW); 
+	//ShowWindow(GetConsoleWindow(), HIDE_WINDOW); 
 	//ShowWindow(GetConsoleWindow(), SW_SHOW);
 
 	// скрывает курсор
-	ShowCursor(false);
+	//ShowCursor(false);
 
 	init_sprites();
 
@@ -189,23 +190,24 @@ int main() {
 		//window_class.hIcon = static_cast<HICON>(LoadImage(NULL, L"icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE));
 	}
 
-	HINSTANCE hInstance = GetModuleHandle(NULL);
-
 	// Register class
 	RegisterClass(&window_class);
 
+	HINSTANCE hInstance = GetModuleHandle(NULL); // дескриптор указанного модуля
+
 	// Create window
 	HWND window = CreateWindow(window_class.lpszClassName, L"C++ Game Engine", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1920, 1080, 0, 0, hInstance, 0);
-	//Fullscreen!!!!!!
-	{
+	// Fullscreen
+	/*{
 		SetWindowLong(window, GWL_STYLE, GetWindowLong(window, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW);
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &mi);
 		SetWindowPos(window, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
-	}
+	}*/
 
-
-	HDC hdc = GetDC(window);
+	// дескриптор устройства (DC) для клиентской области указанного окна или для всего экрана
+	// Используется в последующих функциях GDI для рисования в DС
+	HDC hdc = GetDC(window); 
 
 	Input input = {};
 
