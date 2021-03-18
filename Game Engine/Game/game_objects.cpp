@@ -181,15 +181,15 @@ struct Mouse {
 		if (is_down) {
 			dot pos0(std::min(focus_pos.x, pos.x), std::min(focus_pos.y, pos.y));
 			dot pos1(std::max(focus_pos.x, pos.x), std::max(focus_pos.y, pos.y));
-			draw_rect2(pos0, pos1, Color(0xffffff, 64));
+			draw_rect2(pos0, pos1, Color(0xffffffff, 64));
 		}
 
 		draw_sprite(pos, size, focus ? focus_sprite : sprite, 255, true);
 
 		if (debug_mode) {
-			draw_rect(pos, dot(0.35, 0.35), 0xffffff);
-			draw_number(pos.x, dot(65, 45), 0.5, 0xffffff);
-			draw_number(pos.y, dot(80, 45), 0.5, 0xffffff);
+			draw_rect(pos, dot(0.35, 0.35), 0xffffffff);
+			draw_number(pos.x, dot(65, 45), 0.5, 0xffffffff);
+			draw_number(pos.y, dot(80, 45), 0.5, 0xffffffff);
 		}
 	}
 };

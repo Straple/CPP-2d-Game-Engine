@@ -22,7 +22,7 @@ std::vector<Bush> Bushes = {
 };
 
 void simulate_game(Input& input, point_t delta_time) {
-	clear_screen(0x4d4d4d);
+	clear_screen(0xff4d4d4d);
 
 	if (pressed(BUTTON_ESC)) {
 		running = false;

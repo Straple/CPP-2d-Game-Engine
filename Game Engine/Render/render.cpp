@@ -204,8 +204,8 @@ void draw_texture(dot pos, u32 x_cnt, u32 y_cnt, point_t size, sprite_t texture,
 	const point_t x_summary = pixels.getColLen() * size;
 	const point_t y_summary = pixels.getRowLen() * size;
 
-	for (s32 i = 0; i < y_cnt; i++) {
-		for (s32 j = 0; j < x_cnt; j++) {
+	for (u32 i = 0; i < y_cnt; i++) {
+		for (u32 j = 0; j < x_cnt; j++) {
 			draw_sprite(pos, size, texture, alpha, true);
 			pos.x += x_summary;
 		}

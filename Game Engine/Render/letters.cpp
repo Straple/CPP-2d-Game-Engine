@@ -617,8 +617,8 @@ s32 sprite_len(sprite_t sprite) {
 	s32 right_x = -1;
 	auto& pixels = Sprites[sprite].picture;
 
-	for (s32 i = 0; i < pixels.getRowLen(); i++) {
-		for (s32 j = 0; j < pixels.getColLen(); j++) {
+	for (u32 i = 0; i < pixels.getRowLen(); i++) {
+		for (u32 j = 0; j < pixels.getColLen(); j++) {
 			if (pixels[i][j].is_draw && right_x < j) {
 				right_x = j;
 			}

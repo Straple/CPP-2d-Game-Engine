@@ -227,7 +227,7 @@ public:
         this->height = height;
         this->width = width;
 
-        u32 len = std::max(round_two(height), round_two(width));
+        u64 len = std::max(round_two(height), round_two(width));
         tree = new node[4 * len * len];
     }
 

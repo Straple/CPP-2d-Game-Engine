@@ -36,45 +36,55 @@ void update_controls(HWND& window, Input& input) {
 
 	bool isPeekMessage = false; // прочитали ли мы хоть раз сообщение
 
+	auto set_button = [&input](button_t b, bool is_down, bool changed) -> void {
+		input.buttons[b].is_down = is_down;
+		input.buttons[b].changed = changed;
+	};
+
+	auto button_up = [&input, &set_button](button_t b) -> void {
+		set_button(b, false, true);
+	};
+
+	auto button_down = [&input, &set_button](button_t b) -> void {
+		set_button(b, true, true);
+	};
+
+
 	MSG message;
 	while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
 		isPeekMessage = true;
-
-		auto set_button = [&](button_t b, bool is_down, bool changed) {
-			input.buttons[b].is_down = is_down;
-			input.buttons[b].changed = changed;
-		};
 
 		switch (message.message) {
 
 		case WM_LBUTTONUP: {
 
-			set_button(BUTTON_MOUSE_L, false, true);
+			button_up(BUTTON_MOUSE_L);
 
 		}break;
 
 		case WM_LBUTTONDOWN: {
 
-			set_button(BUTTON_MOUSE_L, true, true);
+			button_down(BUTTON_MOUSE_L);
 
 		}break;
 
 		case WM_RBUTTONUP: {
-			set_button(BUTTON_MOUSE_R, false, true);
+			button_up(BUTTON_MOUSE_R);
 
 		}break;
 
 		case WM_RBUTTONDOWN: {
 
-			set_button(BUTTON_MOUSE_R, true, true);
+			button_down(BUTTON_MOUSE_R);
 
 		}break;
 
 		case WM_KEYUP:
 		case WM_KEYDOWN: {
 
-			u64 vk_code = message.wParam; //button
-			bool is_down = ((message.lParam & (static_cast<u64>(1) << 31)) == 0); // нажата ли она
+			u64 vk_code = message.wParam;
+			bool is_down = (message.message == WM_KEYDOWN);
+
 
 #define update_button(b, vk)\
 case vk: {\
@@ -234,8 +244,8 @@ int main() {
 			}
 
 			if (debug_mode) {
-				draw_number(fps, dot(5, 5) - arena_half_size, 0.5, 0xffffff);
-				draw_number(delta_time * 1000, dot(15, 5) - arena_half_size, 0.5, 0xffffff);
+				draw_number(fps, dot(5, 5) - arena_half_size, 0.5, 0xffffffff);
+				draw_number(delta_time * 1000, dot(15, 5) - arena_half_size, 0.5, 0xffffffff);
 			}
 		}
 

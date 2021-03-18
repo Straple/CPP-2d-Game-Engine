@@ -4,7 +4,7 @@
 #include "../utils.h"
 
 // вернет частоту обновления устройства
-static inline u64 get_performance_frequency() {
+u64 get_performance_frequency() {
     LARGE_INTEGER perf;
 
     if (!QueryPerformanceFrequency(&perf)) {
@@ -17,7 +17,7 @@ static inline u64 get_performance_frequency() {
 const point_t performance_frequency = get_performance_frequency();
 
 // вернет текущий тик
-static inline u64 get_ticks() {
+u64 get_ticks() {
     LARGE_INTEGER ticks;
 
     if (!QueryPerformanceCounter(&ticks)) {
