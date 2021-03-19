@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+[i18n]
+        commitencoding = UTF-8
+        logoutputencoding = KOI8-R
