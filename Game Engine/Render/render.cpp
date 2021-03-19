@@ -1,10 +1,11 @@
 
-const point_t render_scale = 0.01; // масштаб рендеринга
+const point_t render_scale = 0.01; // Г¬Г Г±ГёГІГ ГЎ Г°ГҐГ­Г¤ГҐГ°ГЁГ­ГЈГ 
 
-point_t scale_factor = 0; // множитель масштабирования = render_state.height * render_scale
+point_t scale_factor = 0; // Г¬Г­Г®Г¦ГЁГІГҐГ«Гј Г¬Г Г±ГёГІГ ГЎГЁГ°Г®ГўГ Г­ГЁГї = render_state.height * render_scale
 
+// СЂСѓСЃСЃРєРёР№ СЏР·С‹Рє
 
-// рисует в пикселях
+// Г°ГЁГ±ГіГҐГІ Гў ГЇГЁГЄГ±ГҐГ«ГїГµ
 void draw_pixels(u32 x0, u32 y0, u32 x1, u32 y1, const Color& color) {
 	if (x0 < x1 && y0 < y1) {
 
@@ -32,7 +33,7 @@ void draw_pixels(u32 x0, u32 y0, u32 x1, u32 y1, const Color& color) {
 	}
 }
 
-// рисует прямоугольник в пикселях с обработкой границ
+// Г°ГЁГ±ГіГҐГІ ГЇГ°ГїГ¬Г®ГіГЈГ®Г«ГјГ­ГЁГЄ Гў ГЇГЁГЄГ±ГҐГ«ГїГµ Г± Г®ГЎГ°Г ГЎГ®ГІГЄГ®Г© ГЈГ°Г Г­ГЁГ¶
 void draw_rect_in_pixels(s32 x0, s32 y0, s32 x1, s32 y1, const Color& color) {
 	x0 = clamp<s32>(0, x0, render_state.width);
 	x1 = clamp<s32>(0, x1, render_state.width);
@@ -43,17 +44,17 @@ void draw_rect_in_pixels(s32 x0, s32 y0, s32 x1, s32 y1, const Color& color) {
 	draw_pixels(x0, y0, x1, y1, color);
 }
 
-// зарисовывает весь экран этим цветом
+// Г§Г Г°ГЁГ±Г®ГўГ»ГўГ ГҐГІ ГўГҐГ±Гј ГЅГЄГ°Г Г­ ГЅГІГЁГ¬ Г¶ГўГҐГІГ®Г¬
 void clear_screen(const Color& color) {
 	draw_pixels(0, 0, render_state.width, render_state.height, color);
 }
 
 
-// рисует прямоугольник
+// Г°ГЁГ±ГіГҐГІ ГЇГ°ГїГ¬Г®ГіГЈГ®Г«ГјГ­ГЁГЄ
 void draw_rect(dot pos, dot half_size, const Color& color) {
 	pos += arena_half_size;
 
-	// масштабирование
+	// Г¬Г Г±ГёГІГ ГЎГЁГ°Г®ГўГ Г­ГЁГҐ
 	pos *= scale_factor;
 	half_size *= scale_factor;
 
@@ -140,13 +141,13 @@ void draw_circle(dot pos, point_t radius, const Color& color) {
 	}
 }
 
-// рисует прямоугольник
+// Г°ГЁГ±ГіГҐГІ ГЇГ°ГїГ¬Г®ГіГЈГ®Г«ГјГ­ГЁГЄ
 void draw_rect2(dot pos0, dot pos1, const Color& color) {
 
 	pos0 += arena_half_size;
 	pos1 += arena_half_size;
 
-	// масштабирование
+	// Г¬Г Г±ГёГІГ ГЎГЁГ°Г®ГўГ Г­ГЁГҐ
 	pos0 *= scale_factor;
 	pos1 *= scale_factor;
 
@@ -168,7 +169,7 @@ void static_pos_update(dot& pos, bool is_static) {
 }
 
 
-// рисует спрайт
+// Г°ГЁГ±ГіГҐГІ Г±ГЇГ°Г Г©ГІ
 void draw_sprite(dot pos, point_t size, sprite_t sprite, u8 alpha = 255, bool is_static = !Camera_mod) {
 
 	static_pos_update(pos, is_static);
@@ -191,8 +192,8 @@ void draw_sprite(dot pos, point_t size, sprite_t sprite, u8 alpha = 255, bool is
 	}
 }
 
-// рисует текстуру
-// x_cnt, y_cnt - колво спрайтов по координатам
+// Г°ГЁГ±ГіГҐГІ ГІГҐГЄГ±ГІГіГ°Гі
+// x_cnt, y_cnt - ГЄГ®Г«ГўГ® Г±ГЇГ°Г Г©ГІГ®Гў ГЇГ® ГЄГ®Г®Г°Г¤ГЁГ­Г ГІГ Г¬
 void draw_texture(dot pos, u32 x_cnt, u32 y_cnt, point_t size, sprite_t texture, u8 alpha = 255, bool is_static = !Camera_mod) {
 
 	static_pos_update(pos, is_static);
@@ -214,14 +215,14 @@ void draw_texture(dot pos, u32 x_cnt, u32 y_cnt, point_t size, sprite_t texture,
 	}
 }
 
-// рисует спрайт из листа спрайтов
-// len_x - длина спрайта по x
-// sprite_count - идентификатор спрайта
+// Г°ГЁГ±ГіГҐГІ Г±ГЇГ°Г Г©ГІ ГЁГ§ Г«ГЁГ±ГІГ  Г±ГЇГ°Г Г©ГІГ®Гў
+// len_x - Г¤Г«ГЁГ­Г  Г±ГЇГ°Г Г©ГІГ  ГЇГ® x
+// sprite_count - ГЁГ¤ГҐГ­ГІГЁГґГЁГЄГ ГІГ®Г° Г±ГЇГ°Г Г©ГІГ 
 void draw_spritesheet(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u32 sprite_count, u8 alpha = 255, bool is_static = !Camera_mod) {
 
 	static_pos_update(pos, is_static);
 
-	// приготовления
+	// ГЇГ°ГЁГЈГ®ГІГ®ГўГ«ГҐГ­ГЁГї
 	point_t original_x = pos.x;
 
 	auto& pixels = Sprites[spritesheet].picture;
@@ -245,7 +246,7 @@ void draw_spritesheet(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u3
 
 #include "letters.cpp"
 
-// рисует символ
+// Г°ГЁГ±ГіГҐГІ Г±ГЁГ¬ГўГ®Г«
 void draw_symbol(char symbol, dot pos, point_t size, Color color) {
 
 	if (symbol != ' ') {
@@ -273,7 +274,7 @@ void draw_symbol(char symbol, dot pos, point_t size, Color color) {
 }
 
 
-// рисует текст
+// Г°ГЁГ±ГіГҐГІ ГІГҐГЄГ±ГІ
 void draw_text(text_t text, dot pos, point_t size, Color color) {
 
 	while (*text) {
@@ -283,14 +284,14 @@ void draw_text(text_t text, dot pos, point_t size, Color color) {
 	}
 }
 
-// рисует выравненный текст по центру
+// Г°ГЁГ±ГіГҐГІ ГўГ»Г°Г ГўГ­ГҐГ­Г­Г»Г© ГІГҐГЄГ±ГІ ГЇГ® Г¶ГҐГ­ГІГ°Гі
 void draw_text_align(text_t text, dot pos, point_t size, Color color) {
 
 	pos.x -= text_len(text) * size * 0.5;
 	draw_text(text, pos, size, color);
 }
 
-// рисует число
+// Г°ГЁГ±ГіГҐГІ Г·ГЁГ±Г«Г®
 void draw_number(s64 number, dot pos, point_t size, Color color) {
 
 	draw_text(cast(number).c_str(), pos, size, color);
