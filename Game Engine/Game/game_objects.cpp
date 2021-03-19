@@ -1,4 +1,5 @@
 
+
 struct Bush {
 	dot pos;
 	point_t size;

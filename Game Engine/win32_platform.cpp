@@ -226,6 +226,7 @@ int main() {
 	u32 frame_count = 0; // колво кадров
 	point_t frame_time_accum = 0; // время накопления кадров
 
+
 	while (running) {
 		update_controls(window, input);
 
