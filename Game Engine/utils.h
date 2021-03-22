@@ -25,6 +25,8 @@ using text_t = const char*;
 
 template<typename T>
 T clamp(const T& min, const T& val, const T& max) {
+	assert(min <= max);
+
 	if (val < min) {
 		return min;
 	}
@@ -38,6 +40,8 @@ T clamp(const T& min, const T& val, const T& max) {
 
 template<typename T>
 bool is_between(const T& min, const T& val, const T& max) {
+	assert(min <= max);
+
 	return min <= val && val <= max;
 }
 

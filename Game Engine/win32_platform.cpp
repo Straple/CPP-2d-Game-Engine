@@ -13,7 +13,8 @@
 bool running = true;
 
 const bool debug_mode = true;
-const bool Camera_mod = true; // подвижна ли у нас камера?
+const bool camera_mod = true; // подвижна ли у нас камера?
+const bool fullscreen_mod = true;
 
 Camera camera;
 
@@ -24,7 +25,6 @@ dot arena_half_size; // половина размера игрового окн�
 #include "Render/render.cpp" // рендер
 
 #include "Game/game.cpp" // игра
-
 
 // обновление ввода
 void update_controls(HWND& window, Input& input) {
@@ -137,10 +137,19 @@ case vk: {\
 	// если в message есть положение мыши
 	if (isPeekMessage) {
 		// mouse update
-		mouse.pos = dot(message.pt.x, message.pt.y) * 0.097;
 
-		mouse.pos.x = clamp<point_t>(0, mouse.pos.x, 2 * arena_half_size.x) - arena_half_size.x;
-		mouse.pos.y = -clamp<point_t>(0, mouse.pos.y, 2 * arena_half_size.y) + arena_half_size.y;
+		// взяли местоположение окна
+		RECT rect;
+		GetWindowRect(window, &rect);
+
+		mouse.pos = dot(
+			static_cast<s64>(message.pt.x) - std::max<s32>(0, rect.left),
+			static_cast<s64>(rect.bottom) - message.pt.y
+		)
+			/ scale_factor - arena_half_size;
+
+		mouse.pos.x = clamp<point_t>(-arena_half_size.x, mouse.pos.x, arena_half_size.x);
+		mouse.pos.y = clamp<point_t>(-arena_half_size.y, mouse.pos.y, arena_half_size.y);
 	}
 }
 
@@ -153,7 +162,6 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		running = false;
 	} break;
 
-	case WM_MOVING:
 	case WM_SIZE: {
 
 		// взятие размеров окна
@@ -161,14 +169,14 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			RECT rect;
 			GetClientRect(hwnd, &rect);
 
-			render_state.resize(rect.right - rect.left, rect.bottom - rect.top);
+			render_state.resize(rect.right, rect.bottom);
 		}
 
 		// релаксация масштабирования
 		scale_factor = render_state.height * render_scale;
 
 		// релаксация размеров окна
-		arena_half_size = dot(static_cast<point_t>(render_state.width) / scale_factor, 1.0 / render_scale) * 0.5;
+		arena_half_size = dot(static_cast<point_t>(render_state.width) / scale_factor, static_cast<point_t>(1) / render_scale) * 0.5;
 
 	} break;
 
@@ -181,6 +189,7 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 
 int main() {
+
 
 	//скрывает консоль
 	//ShowWindow(GetConsoleWindow(), HIDE_WINDOW); 
@@ -206,14 +215,13 @@ int main() {
 	HINSTANCE hInstance = GetModuleHandle(NULL); // дескриптор указанного модуля
 
 	// Create window
-	HWND window = CreateWindow(window_class.lpszClassName, L"C++ Game Engine", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1920, 1080, 0, 0, hInstance, 0);
-	// Fullscreen
-	/*{
+	HWND window = CreateWindow(window_class.lpszClassName, L"C++ Game Engine", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1600, 900, 0, 0, hInstance, 0);
+	if(fullscreen_mod) {
 		SetWindowLong(window, GWL_STYLE, GetWindowLong(window, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW);
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &mi);
 		SetWindowPos(window, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
-	}*/
+	}
 
 	// дескриптор устройства (DC) для клиентской области указанного окна или для всего экрана
 	// Используется в последующих функциях GDI для рисования в DС
@@ -221,11 +229,15 @@ int main() {
 
 	Input input = {};
 
-	point_t delta_time = 1.0 / 60;
+	point_t delta_time;
+	auto update_delta_time = [&delta_time]() -> void {
+		static Timer timer;
 
-	u32 frame_count = 0; // колво кадров
-	point_t frame_time_accum = 0; // время накопления кадров
+		delta_time = timer.time();
+		timer.reset();
+	};
 
+	update_delta_time();
 
 	while (running) {
 		update_controls(window, input);
@@ -235,6 +247,8 @@ int main() {
 		// update fps
 		{
 			static s32 fps = 0;
+			static u32 frame_count = 0; // колво кадров
+			static point_t frame_time_accum = 0; // время накопления кадров
 
 			frame_count++;
 			frame_time_accum += delta_time;
@@ -249,7 +263,7 @@ int main() {
 				draw_number(delta_time * 1000, dot(15, 5) - arena_half_size, 0.5, 0xffffffff);
 			}
 		}
-
+		
 		// render screen
 		{
 
@@ -258,12 +272,7 @@ int main() {
 				reinterpret_cast<void*>(render_state.render_memory), &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
 		}
 
-		// update delta time
-		{
-			static Timer timer;
-			delta_time = timer.time();
-			timer.reset();
-		}
+		update_delta_time();
 	}
 
 	return 0;
