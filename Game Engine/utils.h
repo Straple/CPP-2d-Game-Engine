@@ -62,15 +62,9 @@ std::string cast(u64 num) {
 // кастует число в строку
 std::string cast(s64 num) {
 
-	bool isNeg = false;
+	std::string str = cast(static_cast<u64>(abs(num)));
+
 	if (num < 0) {
-		isNeg = true;
-		num *= -1;
-	}
-
-	std::string str = cast(static_cast<u64>(num));
-
-	if (isNeg) {
 		str.insert(str.begin(), '-');
 	}
 	return str;
