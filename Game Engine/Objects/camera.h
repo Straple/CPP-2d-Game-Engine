@@ -10,6 +10,7 @@ struct Camera {
 
     // симуляция (позиция игрока, время между кадрами)
     void simulate(dot player_pos, point_t delta_time) {
+
         simulate_move2d(pos, dp, (player_pos - pos) * speed, delta_time);
     }
 };

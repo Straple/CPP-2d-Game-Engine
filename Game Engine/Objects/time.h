@@ -7,9 +7,7 @@
 u64 get_performance_frequency() {
     LARGE_INTEGER perf;
 
-    if (!QueryPerformanceFrequency(&perf)) {
-        throw "call to QueryPerformanceFrequency fails";
-    }
+    _STL_VERIFY(QueryPerformanceFrequency(&perf), "call to QueryPerformanceFrequency fails");
 
     return perf.QuadPart;
 }
@@ -20,9 +18,7 @@ const point_t performance_frequency = get_performance_frequency();
 u64 get_ticks() {
     LARGE_INTEGER ticks;
 
-    if (!QueryPerformanceCounter(&ticks)) {
-        throw "call to QueryPerformanceCounter fails";
-    }
+    _STL_VERIFY(QueryPerformanceCounter(&ticks), "call to QueryPerformanceCounter fails");
 
     return ticks.QuadPart;
 }

@@ -64,6 +64,11 @@ void simulate_game(Input& input, point_t delta_time) {
 	if (is_down(BUTTON_MOUSE_R)) {
 		draw_rect(mouse.pos, dot(0.5, 0.5), Color(0x00ff00, 128));
 	}
+
+
+	//draw_float(camera.pos.x, 5, dot(), 1, 0xffffffff);
+	//draw_float(camera.pos.y, 5, dot(0, 18), 1, 0xffffffff);
+
 }
 
 #undef is_down

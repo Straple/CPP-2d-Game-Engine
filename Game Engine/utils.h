@@ -8,8 +8,6 @@
 
 #include <algorithm>
 
-#include <cassert>
-
 using s8 = int8_t;
 using u8 = uint8_t;
 using s16 = int16_t;
@@ -25,7 +23,7 @@ using text_t = const char*;
 
 template<typename T>
 T clamp(const T& min, const T& val, const T& max) {
-	assert(min <= max);
+	_STL_VERIFY(min <= max, "WRONG BORDER");
 
 	if (val < min) {
 		return min;
@@ -40,32 +38,74 @@ T clamp(const T& min, const T& val, const T& max) {
 
 template<typename T>
 bool is_between(const T& min, const T& val, const T& max) {
-	assert(min <= max);
+	_STL_VERIFY(min <= max, "WRONG BORDER");
 
 	return min <= val && val <= max;
 }
 
-// кастует число в строку
-std::string cast(s64 num) {
+std::string cast(u64 num) {
 	std::string str;
+
 	if (num == 0) {
 		str = "0";
 	}
 	else {
-		bool isNeg = false;
-		if (num < 0) {
-			isNeg = true;
-			num *= -1;
-		}
 		while (num) {
 			str += num % 10 + '0';
 			num /= 10;
 		}
-		if (isNeg) {
-			str += '-';
-		}
 		std::reverse(str.begin(), str.end());
 	}
+	return str;
+}
+
+// кастует число в строку
+std::string cast(s64 num) {
+
+	bool isNeg = false;
+	if (num < 0) {
+		isNeg = true;
+		num *= -1;
+	}
+
+	std::string str = cast(static_cast<u64>(num));
+
+	if (isNeg) {
+		str.insert(str.begin(), '-');
+	}
+	return str;
+}
+
+std::string cast(point_t num, u32 precision) {
+	std::string str;
+
+	str = cast(static_cast<u64>(abs(num)));
+
+	if (num < 0) {
+		str.insert(str.begin(), '-');
+	}
+
+	num = abs(num - trunc(num));
+
+	str += ".";
+
+	while (num > 0 && precision) {
+		precision--;
+		num *= 10;
+
+		str += trunc(num) + '0';
+
+		num = num - trunc(num);
+	}
+
+	while (str.back() == '0') {
+		str.pop_back();
+	}
+
+	if (str.back() == '.') {
+		str.pop_back();
+	}
+
 	return str;
 }
 

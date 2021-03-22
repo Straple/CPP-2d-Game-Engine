@@ -283,6 +283,12 @@ void draw_text_align(text_t text, dot pos, point_t size, Color color) {
 }
 
 // рисует число
+void draw_float(point_t number, u32 precision, dot pos, point_t size, Color color) {
+
+	draw_text(cast(number, precision).c_str(), pos, size, color);
+}
+
+// рисует число
 void draw_number(s64 number, dot pos, point_t size, Color color) {
 
 	draw_text(cast(number).c_str(), pos, size, color);

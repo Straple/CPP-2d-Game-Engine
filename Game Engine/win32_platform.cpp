@@ -12,9 +12,12 @@
 
 bool running = true;
 
+// project settings
 const bool debug_mode = true;
 const bool camera_mod = true; // подвижна ли у нас камера?
 const bool fullscreen_mod = true;
+const bool show_cursor = false;
+const bool show_console = false;
 
 Camera camera;
 
@@ -190,13 +193,10 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 int main() {
 
+	ShowWindow(GetConsoleWindow(), show_console ? SW_SHOW : SW_HIDE);
 
-	//скрывает консоль
-	//ShowWindow(GetConsoleWindow(), HIDE_WINDOW); 
-	//ShowWindow(GetConsoleWindow(), SW_SHOW);
+	ShowCursor(show_cursor);
 
-	// скрывает курсор
-	//ShowCursor(false);
 
 	init_sprites();
 
@@ -229,7 +229,7 @@ int main() {
 
 	Input input = {};
 
-	point_t delta_time;
+	point_t delta_time = 0;
 	auto update_delta_time = [&delta_time]() -> void {
 		static Timer timer;
 
@@ -247,7 +247,7 @@ int main() {
 		// update fps
 		{
 			static s32 fps = 0;
-			static u32 frame_count = 0; // колво кадров
+			static s32 frame_count = 0; // колво кадров
 			static point_t frame_time_accum = 0; // время накопления кадров
 
 			frame_count++;
@@ -260,7 +260,7 @@ int main() {
 
 			if (debug_mode) {
 				draw_number(fps, dot(5, 5) - arena_half_size, 0.5, 0xffffffff);
-				draw_number(delta_time * 1000, dot(15, 5) - arena_half_size, 0.5, 0xffffffff);
+				draw_float(delta_time, 5, dot(18, 5) - arena_half_size, 0.5, 0xffffffff);
 			}
 		}
 		
@@ -271,6 +271,8 @@ int main() {
 				0, 0, render_state.width, render_state.height,
 				reinterpret_cast<void*>(render_state.render_memory), &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
 		}
+
+		//std::this_thread::sleep_for(std::chrono::milliseconds(80));
 
 		update_delta_time();
 	}
