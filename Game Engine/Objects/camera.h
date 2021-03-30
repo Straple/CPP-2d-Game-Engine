@@ -4,13 +4,11 @@
 #include "../move.h"
 
 struct Camera {
-    dot pos; // позиция
+    dot pos;
     dot dp;
-    const point_t speed = 20; // скорость камеры
 
-    // симуляция (позиция игрока, время между кадрами)
     void simulate(dot player_pos, point_t delta_time) {
 
-        simulate_move2d(pos, dp, (player_pos - pos) * speed, delta_time);
+        move_to2d(pos, player_pos, dp, (player_pos - pos) * 20 , delta_time);
     }
 };

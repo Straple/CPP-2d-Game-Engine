@@ -4,40 +4,37 @@
 #undef max
 #undef min
 
-#include "utils.h" // утилиты
+#include "utils.h"
 
-#include "Objects/objects.h" // объекты
+#include "Objects/objects.h"
 
-#include "Sprites/sprite.cpp" // спрайты
+#include "Sprites/sprite.cpp"
 
 bool running = true;
 
 // project settings
 const bool debug_mode = true;
-const bool camera_mod = true; // подвижна ли у нас камера?
+const bool camera_mod = true; // simulate moves camera?
 const bool fullscreen_mod = true;
-const bool show_cursor = false;
+const bool show_cursor = true;
 const bool show_console = false;
 
 Camera camera;
 
 Render_state render_state;
 
-dot arena_half_size; // половина размера игрового окна
+dot arena_half_size;
 
-#include "Render/render.cpp" // рендер
+#include "Render/render.cpp"
 
-#include "Game/game.cpp" // игра
+#include "Game/game.cpp"
 
-// обновление ввода
 void update_controls(HWND& window, Input& input) {
 
 	// обнуляем значение нажатия кнопки
 	for (int i = 0; i < BUTTON_COUNT; i++) {
 		input.buttons[i].changed = false;
 	}
-
-	bool isPeekMessage = false; // прочитали ли мы хоть раз сообщение
 
 	auto set_button = [&input](button_t b, bool is_down, bool changed) -> void {
 		input.buttons[b].is_down = is_down;
@@ -52,6 +49,7 @@ void update_controls(HWND& window, Input& input) {
 		set_button(b, true, true);
 	};
 
+	bool isPeekMessage = false;
 
 	MSG message;
 	while (PeekMessage(&message, window, 0, 0, PM_REMOVE)) {
@@ -137,11 +135,9 @@ case vk: {\
 		}
 	}
 
-	// если в message есть положение мыши
 	if (isPeekMessage) {
 		// mouse update
 
-		// взяли местоположение окна
 		RECT rect;
 		GetWindowRect(window, &rect);
 
@@ -150,13 +146,9 @@ case vk: {\
 			static_cast<s64>(rect.bottom) - message.pt.y
 		)
 			/ scale_factor - arena_half_size;
-
-		mouse.pos.x = clamp<point_t>(-arena_half_size.x, mouse.pos.x, arena_half_size.x);
-		mouse.pos.y = clamp<point_t>(-arena_half_size.y, mouse.pos.y, arena_half_size.y);
 	}
 }
 
-// функция вызова события для окна
 LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	LRESULT result = 0;
 	switch (uMsg) {
@@ -167,7 +159,7 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 	case WM_SIZE: {
 
-		// взятие размеров окна
+		// get rect window
 		{
 			RECT rect;
 			GetClientRect(hwnd, &rect);
@@ -175,10 +167,10 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			render_state.resize(rect.right, rect.bottom);
 		}
 
-		// релаксация масштабирования
+		// relax scaling
 		scale_factor = render_state.height * render_scale;
 
-		// релаксация размеров окна
+		// relax arena
 		arena_half_size = dot(static_cast<point_t>(render_state.width) / scale_factor, static_cast<point_t>(1) / render_scale) * 0.5;
 
 	} break;
@@ -189,9 +181,6 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	}
 	return result;
 }
-
-#include <thread>
-#include <chrono>
 
 int main() {
 
@@ -249,8 +238,8 @@ int main() {
 		// update fps
 		{
 			static s32 fps = 0;
-			static s32 frame_count = 0; // колво кадров
-			static point_t frame_time_accum = 0; // время накопления кадров
+			static s32 frame_count = 0;
+			static point_t frame_time_accum = 0;
 
 			frame_count++;
 			frame_time_accum += delta_time;
@@ -262,19 +251,16 @@ int main() {
 
 			if (debug_mode) {
 				draw_number(fps, dot(5, 5) - arena_half_size, 0.5, 0xffffffff);
-				draw_float(delta_time, 5, dot(18, 5) - arena_half_size, 0.5, 0xffffffff);
+				draw_number(delta_time, dot(18, 5) - arena_half_size, 0.5, 0xffffffff);
 			}
 		}
 		
 		// render screen
 		{
-
 			StretchDIBits(hdc, 0, 0, render_state.width, render_state.height,
 				0, 0, render_state.width, render_state.height,
 				reinterpret_cast<void*>(render_state.render_memory), &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
 		}
-
-		//std::this_thread::sleep_for(std::chrono::milliseconds(80));
 
 		update_delta_time();
 	}

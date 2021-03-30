@@ -2,6 +2,8 @@
 enum sprite_t {
 
 	SP_bush,
+	SP_small_bush,
+
 	SP_cursor,
 	SP_focus_cursor,
 
@@ -18,14 +20,16 @@ enum sprite_t {
 
 sprite Sprites[sprite_t::SP_COUNT];
 
-// инициализирует все спрайты
 void init_sprites() {
 
 #define init(type, name) Sprites[type] = sprite(std::string("Sprites/") + name)
 
 
 	init(SP_player, "player.esg");
+
 	init(SP_bush, "bush.eng");
+	init(SP_small_bush, "small_bush.eng");
+
 	init(SP_cursor, "cursor.eng");
 	init(SP_focus_cursor, "focus_cursor.eng");
 	init(SP_grass_background, "grass_background.esg");

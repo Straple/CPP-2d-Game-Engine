@@ -15,7 +15,6 @@ struct Bush {
 	}
 };
 
-
 struct Player {
 
 	// движение и позиция
@@ -189,8 +188,8 @@ struct Mouse {
 
 		if (debug_mode) {
 			draw_rect(pos, dot(0.35, 0.35), 0xffffffff);
-			draw_number(pos.x, dot(65, 45), 0.5, 0xffffffff);
-			draw_number(pos.y, dot(80, 45), 0.5, 0xffffffff);
+			draw_number<s64>(pos.x, dot(65, 45), 0.5, 0xffffffff);
+			draw_number<s64>(pos.y, dot(80, 45), 0.5, 0xffffffff);
 		}
 	}
 };

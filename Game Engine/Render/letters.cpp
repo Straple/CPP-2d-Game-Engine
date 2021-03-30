@@ -1,4 +1,4 @@
-text_t small_letters[][7] = {
+п»їtext_t small_letters[][7] = {
 "",
 "",
 " 000", // a
@@ -516,6 +516,14 @@ text_t symbols[][7] = {
 "",
 "",
 
+"", // +
+"",
+"  0",
+" 000",
+"  0",
+"",
+"",
+
 "", // .
 "",
 "",
@@ -540,7 +548,6 @@ text_t symbols[][7] = {
 "",
 "  0",
 };
-
 text_t unused_character[][7] = {
 "00000",
 "0 0 0",
@@ -551,29 +558,32 @@ text_t unused_character[][7] = {
 "00000",
 };
 
-// возвращает ссылку на символ
 text_t* get_symbol(char symbol) {
-	if (is_between('0', symbol, '9')) { // число
+	if (is_between('0', symbol, '9')) { // digit
 		return digits[symbol - '0'];
 	}
-	else if (is_between('a', symbol, 'z')) { // строчная буква
+	else if (is_between('a', symbol, 'z')) { // small letter
 		return small_letters[symbol - 'a'];
 	}
-	else if (is_between('A', symbol, 'Z')) { // заглавная буква
+	else if (is_between('A', symbol, 'Z')) { // letter
 		return letters[symbol - 'A'];
 	}
-	else { // символы
+	else { // symbol
+
 		if (symbol == '-') { // -
 			return symbols[0];
 		}
-		else if (symbol == '.') { // .
+		else if (symbol == '+') {
 			return symbols[1];
 		}
-		else if (symbol == '!') { // !
+		else if (symbol == '.') { // .
 			return symbols[2];
 		}
-		else if (symbol == '?') { // ?
+		else if (symbol == '!') { // !
 			return symbols[3];
+		}
+		else if (symbol == '?') { // ?
+			return symbols[4];
 		}
 		else {
 			return unused_character[0];
@@ -581,7 +591,6 @@ text_t* get_symbol(char symbol) {
 	}
 }
 
-// возвращает длину символа по x
 s32 symbol_len(char symbol) {
 	if (symbol == ' ') {
 		return 4;
@@ -592,7 +601,7 @@ s32 symbol_len(char symbol) {
 		auto memory = get_symbol(symbol);
 		for (u32 i = 0; i < 7; i++) {
 			auto row = memory[i];
-			// u32 j = 0?
+
 			for (s32 j = 1; *row; j++, row++) {
 				if (*row == '0' && right_x < j) {
 					right_x = j;
@@ -603,7 +612,6 @@ s32 symbol_len(char symbol) {
 	}
 }
 
-// возвращает длину текста
 s32 text_len(text_t text) {
 	s32 len = 0;
 	while (*text) {

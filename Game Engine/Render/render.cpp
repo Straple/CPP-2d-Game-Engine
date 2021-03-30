@@ -3,9 +3,8 @@ const point_t render_scale = 0.01; // масштаб рендеринга
 
 point_t scale_factor = 0; // множитель масштабирования = render_state.height * render_scale
 
-
 // рисует в пикселях
-void draw_pixels(u32 x0, u32 y0, u32 x1, u32 y1, const Color& color) {
+void draw_pixels(u32 x0, u32 y0, u32 x1, u32 y1, Color color) {
 	if (x0 < x1 && y0 < y1) {
 
 		Color* row = render_state.render_memory + static_cast<u64>(y0) * render_state.width;
@@ -13,15 +12,14 @@ void draw_pixels(u32 x0, u32 y0, u32 x1, u32 y1, const Color& color) {
 		if (color.a == 255) {
 
 			for (u32 y = y0; y < y1; y++) {
-				for (u32 x = x0; x < x1; x++) {
+				fill(reinterpret_cast<u32*>(row + x0), static_cast<u32>(color), x1 - x0);
 
-					row[x] = color;
-				}
 				row += render_state.width;
 			}
 		}
 		else {
 			for (u32 y = y0; y < y1; y++) {
+
 				for (u32 x = x0; x < x1; x++) {
 
 					row[x] = row[x].combine(color);
@@ -72,63 +70,16 @@ void draw_circle(dot pos, point_t radius, const Color& color) {
 	s32 top_y = clamp<s32>(0, (pos.y + arena_half_size.y - radius) * scale_factor, render_state.height);
 	s32 bottom_y = clamp<s32>(0, (pos.y + arena_half_size.y + radius) * scale_factor, render_state.height - 1);
 
-
-	s32 left_x = (pos.x + arena_half_size.x - radius) * scale_factor;
-	s32 right_x = (pos.x + arena_half_size.x + radius) * scale_factor;
-	s32 mid_x = (left_x + right_x) / 2;
-
-	left_x = clamp<s32>(0, left_x, render_state.width);
-	right_x = clamp<s32>(0, right_x, render_state.width - 1);
-
-
-	s32 lfx = left_x;
-	s32 rfx = right_x;
-
 	for (s32 y = top_y; y <= bottom_y; y++) {
 
-		auto verify = [&](s32 x) -> bool {
-			dot p = dot(x, y) / scale_factor - arena_half_size;
+		point_t h = std::min(radius, abs(y / scale_factor - arena_half_size.y - pos.y));
+		
+		point_t delta = sqrt(quare(radius) - quare(h));
 
-			return (p - pos).getLen() <= radius;
-		};
+		s32 left_x = clamp<s32>(0, (pos.x + arena_half_size.x - delta) * scale_factor, render_state.width);
+		s32 right_x = clamp<s32>(-1, (pos.x + arena_half_size.x + delta) * scale_factor, render_state.width);
 
-		// relax border
-		{
-			if (verify(lfx)) {
-
-				while (lfx >= left_x && verify(lfx)) {
-					lfx--;
-				}
-				lfx++;
-			}
-			else {
-
-				while (lfx <= mid_x && !verify(lfx)) {
-					lfx++;
-				}
-				lfx--;
-			}
-
-			if (!verify(rfx)) {
-
-				while (rfx >= mid_x && !verify(rfx)) {
-					rfx--;
-				}
-				rfx++;
-			}
-			else {
-
-				while (rfx <= right_x && verify(rfx)) {
-					rfx++;
-				}
-				rfx--;
-			}
-		}
-
-		//draw_rect_in_pixels(lfx, y, lfx + 2, y + 1, 0xffffff);
-		//draw_rect_in_pixels(rfx, y, rfx + 2, y + 1, 0x000000);
-
-		draw_pixels(lfx, y, rfx + 1, y + 1, color);
+		draw_pixels(left_x, y, right_x + 1, y + 1, color);
 	}
 }
 
@@ -283,13 +234,8 @@ void draw_text_align(text_t text, dot pos, point_t size, Color color) {
 }
 
 // рисует число
-void draw_float(point_t number, u32 precision, dot pos, point_t size, Color color) {
-
-	draw_text(cast(number, precision).c_str(), pos, size, color);
-}
-
-// рисует число
-void draw_number(s64 number, dot pos, point_t size, Color color) {
+template<typename T>
+void draw_number(const T& number, dot pos, point_t size, Color color) {
 
 	draw_text(cast(number).c_str(), pos, size, color);
 }

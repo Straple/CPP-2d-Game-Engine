@@ -60,7 +60,7 @@ struct dot {
         return x * x + y * y;
     }
     point_t getLen() const {
-        return sqrt(getQuareLen());
+        return hypot(x, y);
     }
 
     bool operator == (const dot& Rhs) const {

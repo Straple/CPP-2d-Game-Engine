@@ -21,6 +21,6 @@
 
 // render objects
 
-#include "quad_tree_render.h"
+// #include "quad_tree_render.h" Статус: не используется
 
 #include "render_state.h" // статус окна
