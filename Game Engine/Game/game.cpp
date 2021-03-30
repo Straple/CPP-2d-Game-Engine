@@ -66,8 +66,8 @@ void simulate_game(Input& input, point_t delta_time) {
 	}
 
 
-	//draw_float(camera.pos.x, 5, dot(), 1, 0xffffffff);
-	//draw_float(camera.pos.y, 5, dot(0, 18), 1, 0xffffffff);
+	draw_float(camera.pos.x, 5, dot(), 1, 0xffffffff);
+	draw_float(camera.pos.y, 5, dot(0, 18), 1, 0xffffffff);
 
 }
 

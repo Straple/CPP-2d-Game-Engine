@@ -190,6 +190,8 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	return result;
 }
 
+#include <thread>
+#include <chrono>
 
 int main() {
 
