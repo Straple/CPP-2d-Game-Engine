@@ -6,8 +6,8 @@
 struct sprite {
 
     struct pixel_t {
-        u32 color;
         bool is_draw;
+        u32 color;
     };
 
     matrix<pixel_t> picture;

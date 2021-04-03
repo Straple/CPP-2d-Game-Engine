@@ -1,7 +1,7 @@
 #pragma once
 
 #include "utils.h"
-#include "Objects/dot.h"
+#include "Objects/Geometry/dot.h"
 
 
 void simulate_move(point_t& p, point_t& dp, point_t ddp, point_t dt) {
@@ -15,7 +15,7 @@ void simulate_move2d(dot& p, dot& dp, dot ddp, point_t dt) {
 	simulate_move(p.y, dp.y, ddp.y, dt);
 }
 
-void move_to(point_t& p, point_t& p_to, point_t& dp, point_t ddp, point_t dt) {
+void move_to(point_t& p, point_t p_to, point_t& dp, point_t ddp, point_t dt) {
 
     point_t to = p;
 
@@ -40,7 +40,7 @@ void move_to(point_t& p, point_t& p_to, point_t& dp, point_t ddp, point_t dt) {
     p = to;
 }
 
-void move_to2d(dot& p, dot p_to, dot& dp, dot ddp, point_t dt) {
+void move_to2d(dot& p, const dot& p_to, dot& dp, dot ddp, point_t dt) {
     move_to(p.x, p_to.x, dp.x, ddp.x, dt);
     move_to(p.y, p_to.y, dp.y, ddp.y, dt);
 }

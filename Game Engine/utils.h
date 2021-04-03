@@ -10,6 +10,10 @@
 
 #include <algorithm>
 
+#include <random>
+
+std::mt19937 rnd(42);
+
 using s8 = int8_t;
 using u8 = uint8_t;
 using s16 = int16_t;
@@ -30,7 +34,7 @@ T quare(const T& val) {
 
 template<typename T>
 T clamp(const T& min, const T& val, const T& max) {
-	_STL_VERIFY(min <= max, "WRONG BORDER");
+	_STL_VERIFY(min <= max, "bad border");
 
 	if (val < min) {
 		return min;
@@ -45,11 +49,12 @@ T clamp(const T& min, const T& val, const T& max) {
 
 template<typename T>
 bool is_between(const T& min, const T& val, const T& max) {
-	_STL_VERIFY(min <= max, "WRONG BORDER");
+	_STL_VERIFY(min <= max, "bad border");
 
 	return min <= val && val <= max;
 }
 
+// object -> string
 template<typename T>
 std::string cast(const T& val) {
 
@@ -85,4 +90,3 @@ void fill(u32* dest, u32 val32, u32 len) {
 		dest[len - 1] = val32;
 	}
 }
-

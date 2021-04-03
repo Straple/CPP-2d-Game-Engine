@@ -10,14 +10,18 @@
 
 #include "Sprites/sprite.cpp"
 
-bool running = true;
-
 // project settings
-const bool debug_mode = true;
-const bool camera_mod = true; // simulate moves camera?
-const bool fullscreen_mod = true;
-const bool show_cursor = true;
+
+bool running        = true;
+bool fullscreen_mod = true;
+bool fullscreen_mod_is_changed = false;
+
+const bool debug_mode   = false;
+const bool camera_mod   = true; // simulate moves camera?
+const bool show_cursor  = true;
 const bool show_console = false;
+
+// global variables
 
 Camera camera;
 
@@ -142,7 +146,7 @@ case vk: {\
 		GetWindowRect(window, &rect);
 
 		mouse.pos = dot(
-			static_cast<s64>(message.pt.x) - std::max<s32>(0, rect.left),
+			static_cast<s64>(message.pt.x) - std::max<s32>(0, rect.left) + 0.2,
 			static_cast<s64>(rect.bottom) - message.pt.y
 		)
 			/ scale_factor - arena_half_size;
@@ -188,7 +192,6 @@ int main() {
 
 	ShowCursor(show_cursor);
 
-
 	init_sprites();
 
 	// Create Window class
@@ -197,7 +200,7 @@ int main() {
 		window_class.style = CS_HREDRAW | CS_VREDRAW;
 		window_class.lpszClassName = L"Game Window Class";
 		window_class.lpfnWndProc = window_callback;
-		//window_class.hIcon = static_cast<HICON>(LoadImage(NULL, L"icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE));
+		window_class.hIcon = static_cast<HICON>(LoadImage(NULL, L"apple.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE));
 	}
 
 	// Register class
@@ -207,11 +210,33 @@ int main() {
 
 	// Create window
 	HWND window = CreateWindow(window_class.lpszClassName, L"C++ Game Engine", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1600, 900, 0, 0, hInstance, 0);
-	if(fullscreen_mod) {
+	
+	// SetWindowLong WS макросы
+	// 
+	// WS_CAPTION | WS_SYSMENU | WS_TABSTOP | WS_MINIMIZEBOX | WS_SIZEBOX
+	// WS_CAPTION создает верхнюю панель окна и убирает окно из fullscreen
+	// WS_SYSMENU создает "крестик" на панели окна
+	// WS_TABSTOP создает "квадратик" на панели окна
+	// WS_MINIMIZEBOX создает кнопку сворачивания окна
+	// WS_SIZEBOX создает бох для изменения размеров окна
+	// вместе они создают обычное окно
+
+	auto set_fullscreen_mod = [&]() {
 		SetWindowLong(window, GWL_STYLE, GetWindowLong(window, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW);
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &mi);
 		SetWindowPos(window, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	};
+	
+	auto set_window_mod = [&]() {
+		SetWindowLong(window, GWL_STYLE, WS_CAPTION | WS_SYSMENU | WS_TABSTOP | WS_MINIMIZEBOX | WS_SIZEBOX);
+		MONITORINFO mi = { sizeof(mi) };
+		GetMonitorInfo(MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &mi);
+		SetWindowPos(window, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_SHOWWINDOW);
+	};
+
+	if (fullscreen_mod) {
+		set_fullscreen_mod();
 	}
 
 	// дескриптор устройства (DC) для клиентской области указанного окна или для всего экрана
@@ -230,9 +255,24 @@ int main() {
 
 	update_delta_time();
 
+	Timer global_time;
+
 	while (running) {
+		if (fullscreen_mod_is_changed) {
+			fullscreen_mod_is_changed = false;
+			fullscreen_mod = !fullscreen_mod;
+
+			if (fullscreen_mod) {
+				set_fullscreen_mod();
+			}
+			else {
+				set_window_mod();
+			}
+		}
+
 		update_controls(window, input);
 
+		
 		simulate_game(input, delta_time);
 
 		// update fps
@@ -250,11 +290,14 @@ int main() {
 			}
 
 			if (debug_mode) {
-				draw_number(fps, dot(5, 5) - arena_half_size, 0.5, 0xffffffff);
-				draw_number(delta_time, dot(18, 5) - arena_half_size, 0.5, 0xffffffff);
+				draw_object(fps, dot(5, 5) - arena_half_size, 0.5, 0xffffffff);
+
+				draw_object(int(delta_time * 1000), dot(20, 5) - arena_half_size, 0.5, 0xffffffff);
+
+				draw_object(global_time.time(), dot(35, 5) - arena_half_size, 0.5, 0xffffffff);
 			}
 		}
-		
+
 		// render screen
 		{
 			StretchDIBits(hdc, 0, 0, render_state.width, render_state.height,

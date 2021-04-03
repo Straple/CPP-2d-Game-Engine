@@ -1,17 +1,32 @@
 
+// функции внутри game objects
+// simulate - обновить объект
+// draw - рисовать объект
 
 struct Bush {
 	dot pos;
 	point_t size;
 
 	Bush(dot pos, point_t size) {
-		this->pos = pos;
+		this->pos = pos + dot(7.7, -10);
 		this->size = size;
 	}
 
+	void simulate(dot* player_pos) {
+		collision_circle coll_circle{ Circle(pos, 8) };
+
+		coll_circle.bubble(player_pos);
+	}
+
 	void draw() {
-		draw_sprite(pos, size, SP_large_shadow, 128);
-		draw_sprite(pos, size, SP_bush);
+		draw_sprite(pos - dot(7.7, -10), size, SP_large_shadow, 128);
+		draw_sprite(pos - dot(7.7, -10), size, SP_bush);
+
+		if (debug_mode) {
+			collision_circle coll_circle{ Circle(pos, 8) };
+
+			draw_circle(Circle(coll_circle.circle.pos - camera.pos, coll_circle.circle.radius), Color(0xffffff, 50));
+		}
 	}
 };
 
@@ -110,7 +125,7 @@ struct Player {
 	} player_anim_tree;
 
 	// предыдущая анимация
-	Player_anim_tree::player_anim_t prev_anim = Player_anim_tree::none;
+	Player_anim_tree::player_anim_t prev_anim = Player_anim_tree::idle_right;
 
 	Player(dot pos, point_t size) {
 		this->pos = pos;
@@ -120,6 +135,10 @@ struct Player {
 	void draw() {
 		draw_sprite(pos - dot(size, -size * 1.3) * 32, size, SP_medium_shadow, 128);
 		player_anim_tree.Anims[prev_anim].draw(pos - dot(size, -size * 1.3) * 32, size);
+
+		if (debug_mode) {
+			draw_circle(Circle(pos - camera.pos, 0.6), Color(0xff0000, 128));
+		}
 	}
 
 	void simulate(point_t delta_time, dot ddp) {
@@ -132,7 +151,7 @@ struct Player {
 
 			// нужно понять какую анимацию воспроизводить
 
-			// текущая анимация
+			// текущая анимация+
 			auto current_anim = player_anim_tree.get_anim(ddp.normalize(), prev_anim);
 
 			if (prev_anim != current_anim) { // у нас сменились анимации
@@ -157,11 +176,9 @@ struct Mouse {
 	point_t size;
 
 	dot pos;
-
 	dot focus_pos; // позиция точки, когда мы нажали на мышку и удерживали
 
 	bool focus = false;
-
 	bool is_down = false;
 
 	Mouse(sprite_t sprite, sprite_t focus_sprite, point_t size) {
@@ -170,26 +187,93 @@ struct Mouse {
 		this->size = size;
 	}
 
-	void update(Input& input) {
+	void simulate(const Input& input) {
 		if (pressed(BUTTON_MOUSE_L)) {
 			focus_pos = pos;
 		}
 		is_down = is_down(BUTTON_MOUSE_L);
+		focus = false;
 	}
 
 	void draw() {
 		if (is_down) {
 			dot pos0(std::min(focus_pos.x, pos.x), std::min(focus_pos.y, pos.y));
 			dot pos1(std::max(focus_pos.x, pos.x), std::max(focus_pos.y, pos.y));
-			draw_rect2(pos0, pos1, Color(0xffffffff, 64));
+			draw_rect2(pos0, pos1, Color(0xffffff, 64));
+
+			draw_line(Line(focus_pos, pos), 0.3, 0xffffffff);
 		}
 
-		draw_sprite(pos, size, focus ? focus_sprite : sprite, 255, true);
+		if (focus) {
+			draw_sprite(pos - dot(16, 0) * size, size, focus_sprite, 0xff, true);
+		}
+		else {
+			draw_sprite(pos, size, sprite, 0xff, true);
+		}
+		
 
 		if (debug_mode) {
 			draw_rect(pos, dot(0.35, 0.35), 0xffffffff);
-			draw_number<s64>(pos.x, dot(65, 45), 0.5, 0xffffffff);
-			draw_number<s64>(pos.y, dot(80, 45), 0.5, 0xffffffff);
+			draw_object<s64>(pos.x, dot(65, 45), 0.5, 0xffffffff);
+			draw_object<s64>(pos.y, dot(80, 45), 0.5, 0xffffffff);
+		}
+	}
+};
+
+// текст с колизией
+struct button { // кнопка
+	text_t text;
+	dot pos; // центр текста по x
+	point_t size;
+	collision_box coll;
+	Color color, // usual color
+		focus_color; // color when the button doesn't focus
+	bool is_align, is_focus;
+
+	button() {}
+
+	button(text_t _text, dot _pos, point_t _size, Color _color, Color _focus_color, bool align = false) {
+		is_align = align;
+		is_focus = false;
+		text = _text;
+		pos.x = _pos.x + 0.5f * _size;
+		pos.y = _pos.y - 0.5f * _size;
+		size = _size;
+		color = _color;
+		focus_color = _focus_color;
+
+		// !создать коллизию!
+		{
+			int len = text_len(_text);
+
+			coll.p0 = dot(_pos.x + (align ? -(size * len) * 0.5 : 0), _pos.y);
+			coll.p1.x = _pos.x + size * len - size + (align ? -(size * len) * 0.5 : 0);
+			coll.p1.y = _pos.y - size * 6 - size;
+		}
+	}
+
+	void draw() {
+		if (is_align) {
+			draw_text_align(text, pos, size, (is_focus ? focus_color : color));
+		}
+		else {
+			draw_text(text, pos, size, (is_focus ? focus_color : color));
+		}
+
+		if (debug_mode) {
+			draw_rect(coll.p0, dot(0.5, 0.5), 0xff00ff00);
+			draw_rect(coll.p1, dot(0.5, 0.5), 0xff00ff00);
+		}
+	}
+
+	// обновит состояние фокуса мыши
+	void simulate(Mouse* mouse) {
+		if (coll.trigger(mouse->pos)) {
+			mouse->focus = true;
+			is_focus = true;
+		}
+		else {
+			is_focus = false;
 		}
 	}
 };

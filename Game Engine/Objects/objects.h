@@ -3,24 +3,29 @@
 
 // basic objects
 
-#include "color.h" // Color
+#include "color.h"
 
-#include "time.h" // время
+#include "time.h"
 
-#include "dot.h" // dot
+#include "platform_common.h" // input
 
-#include "platform_common.h" // ввод
+// geometry
 
+#include "Geometry/geometry.h"
+
+// collision
+
+#include "collision.h"
 
 // complex objects
 
-#include "camera.h" // камера
+#include "camera.h"
 
-#include "sprite.h" // sprite
+#include "sprite.h"
 
 
 // render objects
 
-// #include "quad_tree_render.h" Статус: не используется
+// #include "quad_tree_render.h" not used
 
-#include "render_state.h" // статус окна
+#include "render_state.h"

@@ -7,6 +7,7 @@ struct Render_state {
     u32 height, width;
 
     Color* render_memory; // память для рендера
+    u32 render_memory_len = 0;
 
     BITMAPINFO bitmap_info;
 
@@ -17,11 +18,13 @@ struct Render_state {
 
         // update render_memory
         {
-            if (render_memory) {
-                delete[] render_memory;
-            }
             u64 size = static_cast<u64>(w) * h;
-            render_memory = new Color[size];
+
+            if (render_memory_len < size) { // не хватает памяти
+                delete[] render_memory;
+                render_memory = new Color[size];
+                render_memory_len = size;
+            }
         }
         
         // update bitmap_info
