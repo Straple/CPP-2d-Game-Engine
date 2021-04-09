@@ -112,7 +112,7 @@ public:
     }
 
     T* operator [](u32 row) const {
-        _STL_VERIFY(row < rowLen, "WRONG ROW");
+        ASSERT(row < rowLen, "WRONG ROW");
 
         return memory + row * colLen;
     }

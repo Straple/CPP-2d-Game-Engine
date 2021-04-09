@@ -5,6 +5,11 @@ void static_pos_update(dot& pos, bool is_static) {
 	}
 }
 
+// проверяет пересечение экрана и этого прямоугольника
+bool arena_query(point_t left, point_t right, point_t top, point_t bottom) {
+	return !(right < -arena_half_size.x || arena_half_size.x < left || // x
+		     top < -arena_half_size.y || arena_half_size.y < bottom); // y
+}
 
 // рисует спрайт
 void draw_sprite(dot pos, point_t size, sprite_t sprite, u8 alpha = 0xff, bool is_static = !camera_mod) {
@@ -16,15 +21,20 @@ void draw_sprite(dot pos, point_t size, sprite_t sprite, u8 alpha = 0xff, bool i
 
 	auto& pixels = Sprites[sprite].picture;
 
-	for (u32 i = 0; i < pixels.getRowLen(); i++) {
-		for (u32 j = 0; j < pixels.getColLen(); j++) {
-			if (pixels[i][j].is_draw) {
-				draw_rect(pos, half_size, Color(pixels[i][j].color, alpha));
+	if (arena_query(pos.x - half_size.x, pos.x + pixels.getColLen() * size + half_size.x,
+		pos.y + half_size.y, pos.y - pixels.getRowLen() * size - half_size.y)) {
+
+
+		for (u32 i = 0; i < pixels.getRowLen(); i++) {
+			for (u32 j = 0; j < pixels.getColLen(); j++) {
+				if (pixels[i][j].is_draw) {
+					draw_rect(pos, half_size, Color(pixels[i][j].color, alpha));
+				}
+				pos.x += size;
 			}
-			pos.x += size;
+			pos.y -= size;
+			pos.x = original_x;
 		}
-		pos.y -= size;
-		pos.x = original_x;
 	}
 }
 
@@ -58,23 +68,27 @@ void draw_spritesheet(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u3
 
 	static_pos_update(pos, !camera_mod);
 
-	// приготовления
 	point_t original_x = pos.x;
+	dot half_size = dot(0.5, 0.5) * size;
 
 	auto& pixels = Sprites[spritesheet].picture;
 
 	u32 begin_x = len_x * sprite_count;
 	u32 end_x = begin_x + len_x;
 
-	for (u32 i = 0; i < pixels.getRowLen(); i++) {
-		for (u32 j = begin_x; j < end_x; j++) {
-			if (pixels[i][j].is_draw) {
-				draw_rect2(pos, pos + dot(size, size), Color(pixels[i][j].color, alpha));
-			}
+	if (arena_query(pos.x - half_size.x, pos.x + len_x * size + half_size.x,
+		pos.y + half_size.y, pos.y - pixels.getRowLen() * size - half_size.y)) {
 
-			pos.x += size;
+		for (u32 i = 0; i < pixels.getRowLen(); i++) {
+			for (u32 j = begin_x; j < end_x; j++) {
+				if (pixels[i][j].is_draw) {
+					draw_rect(pos, half_size, Color(pixels[i][j].color, alpha));
+				}
+
+				pos.x += size;
+			}
+			pos.y -= size;
+			pos.x = original_x;
 		}
-		pos.y -= size;
-		pos.x = original_x;
 	}
 }

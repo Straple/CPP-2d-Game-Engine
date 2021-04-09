@@ -34,7 +34,7 @@ T quare(const T& val) {
 
 template<typename T>
 T clamp(const T& min, const T& val, const T& max) {
-	_STL_VERIFY(min <= max, "bad border");
+	ASSERT(min <= max, "bad border");
 
 	if (val < min) {
 		return min;
@@ -49,7 +49,7 @@ T clamp(const T& min, const T& val, const T& max) {
 
 template<typename T>
 bool is_between(const T& min, const T& val, const T& max) {
-	_STL_VERIFY(min <= max, "bad border");
+	ASSERT(min <= max, "bad border");
 
 	return min <= val && val <= max;
 }
@@ -59,7 +59,7 @@ template<typename T>
 std::string cast(const T& val) {
 
 	std::ostringstream oss;
-	oss << std::fixed << std::setprecision(4) << val;
+	oss << std::setprecision(4) << val;
 
 	std::string s = oss.str();
 	

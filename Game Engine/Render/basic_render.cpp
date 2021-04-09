@@ -1,5 +1,4 @@
 
-
 // рисует в пикселях
 void draw_pixels(u16 x0, u16 y0, u16 x1, u16 y1, const Color& color) {
 

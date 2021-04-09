@@ -56,21 +56,24 @@ void draw_circle(const Circle& circle, const Color& color) {
 void draw_line(const Line& line, point_t half_size, const Color& color) {
 	dot half_size_pt(half_size, half_size);
 
-	for (u32 x = 0; x < render_state.width; x++) {
-		point_t pos_x = x / scale_factor - arena_half_size.x;
-		// a*x + b*y + c = 0
-		// b*y = -(c + a*x)
-		// y = -(c + a*x)/b
-		point_t pos_y = -(line.get_c() + line.get_a() * pos_x) / line.get_b();
-		draw_rect(dot(pos_x, pos_y), half_size_pt, color);
+	if (abs(line.get_b()) >= 0.5) {
+		for (u32 x = 0; x < render_state.width; x++) {
+			point_t pos_x = x / scale_factor - arena_half_size.x;
+			// a*x + b*y + c = 0
+			// b*y = -(c + a*x)
+			// y = -(c + a*x)/b
+			point_t pos_y = -(line.get_c() + line.get_a() * pos_x) / line.get_b();
+			draw_rect(dot(pos_x, pos_y), half_size_pt, color);
+		}
 	}
-
-	for (u32 y = 0; y < render_state.height; y++) {
-		point_t pos_y = y / scale_factor - arena_half_size.y;
-		// a*x + b*y + c = 0
-		// a*x = -(c + b*y)
-		// x = -(c + b*y)/a
-		point_t pos_x = -(line.get_c() + line.get_b() * pos_y) / line.get_a();
-		draw_rect(dot(pos_x, pos_y), half_size_pt, color);
+	else {
+		for (u32 y = 0; y < render_state.height; y++) {
+			point_t pos_y = y / scale_factor - arena_half_size.y;
+			// a*x + b*y + c = 0
+			// a*x = -(c + b*y)
+			// x = -(c + b*y)/a
+			point_t pos_x = -(line.get_c() + line.get_b() * pos_y) / line.get_a();
+			draw_rect(dot(pos_x, pos_y), half_size_pt, color);
+		}
 	}
 }

@@ -1,8 +1,53 @@
 ﻿
+/*
+*       y ^
+*		  |
+*		  |
+*		  |
+*		  |
+*		  |
+*         +----------->
+*	     O   		  x
+*
+*/
+
+/*
+*  	 	  left                                            right
+*           |                                               |
+*     top --+-----------------------------------------------+
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*           |                                               |
+*  bottom --+-----------------------------------------------+
+*
+*
+*/
+
+/*  
+*	p0 = (x0, y0)
+*   p1 = (x1, y1)
+* 
+*	p0---+
+*	|	 |
+*	|    |
+*	|    |
+*	+----p1
+*/
+
+
 #include <windows.h>
 
 #undef max
 #undef min
+
+#include "assert.h"
 
 #include "utils.h"
 
@@ -18,7 +63,7 @@ bool fullscreen_mod_is_changed = false;
 
 const bool debug_mode   = false;
 const bool camera_mod   = true; // simulate moves camera?
-const bool show_cursor  = true;
+const bool show_cursor  = false;
 const bool show_console = false;
 
 // global variables

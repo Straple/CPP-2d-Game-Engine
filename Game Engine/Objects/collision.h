@@ -2,17 +2,6 @@
 
 #include "Geometry/geometry.h"
 
-/*
-*       y ^
-*		  |
-*		  |
-*		  |
-*		  |
-*		  |
-*         +----------->
-*	     O   		  x
-*
-*/
 
 /*  p0---+
 *	|	 |
@@ -26,7 +15,7 @@ struct collision_box {
 	collision_box(){}
 
 	collision_box(const dot& p0, const dot& p1) {
-		_STL_VERIFY(p0.x <= p1.x && p1.y <= p0.y, "bad points");
+		ASSERT(p0.x <= p1.x && p1.y <= p0.y, "bad points");
 
 		this->p0 = p0;
 		this->p1 = p1;

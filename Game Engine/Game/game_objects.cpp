@@ -25,7 +25,10 @@ struct Bush {
 		if (debug_mode) {
 			collision_circle coll_circle{ Circle(pos, 8) };
 
-			draw_circle(Circle(coll_circle.circle.pos - camera.pos, coll_circle.circle.radius), Color(0xffffff, 50));
+			dot pos = coll_circle.circle.pos;
+			static_pos_update(pos, !camera_mod);
+
+			draw_circle(Circle(pos, coll_circle.circle.radius), Color(0xffffff, 50));
 		}
 	}
 };
@@ -137,7 +140,10 @@ struct Player {
 		player_anim_tree.Anims[prev_anim].draw(pos - dot(size, -size * 1.3) * 32, size);
 
 		if (debug_mode) {
-			draw_circle(Circle(pos - camera.pos, 0.6), Color(0xff0000, 128));
+			dot p = pos;
+			static_pos_update(p, !camera_mod);
+
+			draw_circle(Circle(p, 0.6), Color(0xff0000, 128));
 		}
 	}
 
@@ -200,6 +206,10 @@ struct Mouse {
 			dot pos0(std::min(focus_pos.x, pos.x), std::min(focus_pos.y, pos.y));
 			dot pos1(std::max(focus_pos.x, pos.x), std::max(focus_pos.y, pos.y));
 			draw_rect2(pos0, pos1, Color(0xffffff, 64));
+
+			draw_object(Line(focus_pos, pos).get_a(), dot(), 0.3, 0xffffffff);
+			draw_object(Line(focus_pos, pos).get_b(), dot(0, 10), 0.3, 0xffffffff);
+			draw_object(Line(focus_pos, pos).get_c(), dot(0, 20), 0.3, 0xffffffff);
 
 			draw_line(Line(focus_pos, pos), 0.3, 0xffffffff);
 		}

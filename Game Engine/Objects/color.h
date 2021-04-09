@@ -2,8 +2,6 @@
 
 #include "../utils.h"
 
-#include "matrix.h"
-
 //u8* build_dp_blend() {
 //    u8* dp = new u8[256 * 256];
 //
@@ -37,6 +35,7 @@ struct Color {
         b = calc_color(alpha, blue);
         a = alpha;
     }
+    // 0xRRGGBB, alpha
     Color(u32 rgb, u8 alpha) {
         *reinterpret_cast<u32*>(this) = rgb;
 

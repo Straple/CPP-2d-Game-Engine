@@ -4,6 +4,8 @@
 
 #include "game_objects.cpp"
 
+// global variables
+
 Mouse mouse(SP_cursor, SP_focus_cursor, 0.09);
 
 Player player(dot(0, 0), 0.5);
@@ -24,6 +26,8 @@ std::vector<Bush> Bushes = {
 collision_box box(dot(-10, 10), dot(10, -10));
 
 button btn("click", dot(), 1, 0xffffffff, 0xffff0000, false);
+
+
 
 void simulate_physics(const Input& input, point_t delta_time) {
 
@@ -54,7 +58,7 @@ void render_game(const Input& input) {
 
 	clear_screen(0xff4d4d4d);
 
-	draw_texture(dot(-arena_half_size.x, arena_half_size.y), 4, 2, 0.5, SP_grass_background);
+	draw_texture(dot(-50, 20), 4, 2, 0.5, SP_grass_background);
 
 	// draw player and bushes
 	{
@@ -73,7 +77,17 @@ void render_game(const Input& input) {
 		}
 	}
 	
-	draw_rect2(dot(box.p0.x, box.p1.y) - camera.pos, dot(box.p1.x, box.p0.y) - camera.pos, 0x30ffffff);
+	// draw collision box
+	{
+		dot pos0(box.p0.x, box.p1.y);
+		static_pos_update(pos0, !camera_mod);
+
+		dot pos1(box.p1.x, box.p0.y);
+		static_pos_update(pos1, !camera_mod);
+
+		draw_rect2(pos0, pos1, 0x30ffffff);
+	}
+	
 
 	mouse.draw();
 
@@ -108,6 +122,47 @@ void render_game(const Input& input) {
 
 void simulate_game(const Input& input, point_t delta_time) {
 
+	// update render_scale
+	{
+		if (is_down(BUTTON_UP)) {
+
+			point_t pt_x = (mouse.pos.x + arena_half_size.x) * scale_factor;
+			point_t pt_y = (mouse.pos.y + arena_half_size.y) * scale_factor;
+
+
+			render_scale *= 0.95;
+
+			// relax scaling
+			scale_factor = render_state.height * render_scale;
+
+			// relax arena
+			arena_half_size = dot(static_cast<point_t>(render_state.width) / scale_factor, static_cast<point_t>(1) / render_scale) * 0.5;
+
+
+			mouse.pos = dot(pt_x, pt_y)
+				/ scale_factor - arena_half_size;
+		}
+
+		if (is_down(BUTTON_DOWN)) {
+			point_t pt_x = (mouse.pos.x + arena_half_size.x) * scale_factor;
+			point_t pt_y = (mouse.pos.y + arena_half_size.y) * scale_factor;
+
+
+			render_scale /= 0.95;
+
+			// relax scaling
+			scale_factor = render_state.height * render_scale;
+
+			// relax arena
+			arena_half_size = dot(static_cast<point_t>(render_state.width) / scale_factor, static_cast<point_t>(1) / render_scale) * 0.5;
+
+
+			mouse.pos = dot(pt_x, pt_y)
+				/ scale_factor - arena_half_size;
+		}
+	}
+
+
 	if (pressed(BUTTON_ESC)) {
 		running = false;
 	}
@@ -120,8 +175,6 @@ void simulate_game(const Input& input, point_t delta_time) {
 	simulate_physics(input, delta_time);
 
 	render_game(input);
-
-	
 }
 
 #undef is_down

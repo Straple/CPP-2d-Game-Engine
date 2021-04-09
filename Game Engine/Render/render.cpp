@@ -1,5 +1,5 @@
 
-const point_t render_scale = 0.01; // масштаб рендеринга
+point_t render_scale = 0.01; // масштаб рендеринга
 
 point_t scale_factor = 0; // множитель масштабирования = render_state.height * render_scale
 
