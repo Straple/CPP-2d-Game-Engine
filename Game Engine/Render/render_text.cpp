@@ -1,7 +1,7 @@
-
+п»ї
 #include "letters.cpp"
 
-// рисует символ
+// СЂРёСЃСѓРµС‚ СЃРёРјРІРѕР»
 void draw_symbol(char symbol, dot pos, point_t size, const Color& color) {
 
 	if (symbol != ' ') {
@@ -28,7 +28,7 @@ void draw_symbol(char symbol, dot pos, point_t size, const Color& color) {
 	}
 }
 
-// рисует текст
+// СЂРёСЃСѓРµС‚ С‚РµРєСЃС‚
 void draw_text(text_t text, dot pos, point_t size, const Color& color) {
 
 	while (*text) {
@@ -38,16 +38,16 @@ void draw_text(text_t text, dot pos, point_t size, const Color& color) {
 	}
 }
 
-// рисует выравненный текст по центру
+// СЂРёСЃСѓРµС‚ РІС‹СЂР°РІРЅРµРЅРЅС‹Р№ С‚РµРєСЃС‚ РїРѕ С†РµРЅС‚СЂСѓ
 void draw_text_align(text_t text, dot pos, point_t size, const Color& color) {
 
 	pos.x -= text_len(text) * size * 0.5;
 	draw_text(text, pos, size, color);
 }
 
-// рисует число
+// СЂРёСЃСѓРµС‚ С‡РёСЃР»Рѕ
 template<typename T>
 void draw_object(const T& object, dot pos, point_t size, const Color& color) {
 
-	draw_text(cast(object).c_str(), pos, size, color);
+	draw_text(to_string(object).c_str(), pos, size, color);
 }

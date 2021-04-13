@@ -1,15 +1,21 @@
-#pragma once
+﻿#pragma once
 
+#include "assert.h"
+
+// streams
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
 
+// structures
 #include <string>
 #include <vector>
 
+// algo
 #include <algorithm>
 
+// random
 #include <random>
 
 std::mt19937 rnd(42);
@@ -56,7 +62,7 @@ bool is_between(const T& min, const T& val, const T& max) {
 
 // object -> string
 template<typename T>
-std::string cast(const T& val) {
+std::string to_string(const T& val) {
 
 	std::ostringstream oss;
 	oss << std::setprecision(4) << val;

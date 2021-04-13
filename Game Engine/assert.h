@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 
-#define DEBUG_MODE true
+#define DEBUG_MODE
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 
 #define ASSERT(condition, message) _STL_VERIFY(condition, message)
 

@@ -1,9 +1,14 @@
-#pragma once
+п»ї#pragma once
 
-#include <windows.h>
 #include "../utils.h"
 
-// вернет частоту обновления устройства
+// С‚РёРєРё РІРµРґСѓС‚СЃСЏ СЃ 1-РіРѕ СЏРЅРІР°СЂСЏ 1970 Рі. 00:00:00 Р’СЃРµРјРёСЂРЅРѕРіРѕ РІСЂРµРјРµРЅРё
+
+#if defined(_WIN32)
+
+#include <windows.h>
+
+// РІРµСЂРЅРµС‚ С‡Р°СЃС‚РѕС‚Сѓ РѕР±РЅРѕРІР»РµРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 u64 get_performance_frequency() {
     LARGE_INTEGER perf;
 
@@ -12,9 +17,7 @@ u64 get_performance_frequency() {
     return perf.QuadPart;
 }
 
-const point_t performance_frequency = get_performance_frequency();
-
-// вернет текущий тик
+// РІРµСЂРЅРµС‚ С‚РµРєСѓС‰РёР№ С‚РёРє
 u64 get_ticks() {
     LARGE_INTEGER ticks;
 
@@ -22,6 +25,32 @@ u64 get_ticks() {
 
     return ticks.QuadPart;
 }
+
+#elif defined(__linux__) || defined (__APPLE__)
+
+#include <sys/time.h>
+
+// РІРµСЂРЅРµС‚ С‡Р°СЃС‚РѕС‚Сѓ РѕР±РЅРѕРІР»РµРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+u64 get_performance_frequency() {
+    return 1'000'000; // РєРѕР»РІРѕ РјРёРєСЂРѕСЃРµРєСѓРЅРґ РІ СЃРµРєСѓРЅРґРµ
+}
+
+// РІРµСЂРЅРµС‚ С‚РµРєСѓС‰РёР№ С‚РёРє
+u64 get_ticks() {
+    timeval ticks;
+
+    // РІРµСЂРЅРµС‚ -1 РІ СЃР»СѓС‡Р°Рµ РѕС€РёР±РєРё
+    ASSERT(gettimeofdey(&ticks, NULL) == 0, "call to gettimeofday fails");
+    return ticks.tv_usec;
+}
+
+#else 
+
+// not supported operating system
+
+#endif
+
+const point_t performance_frequency = get_performance_frequency();
 
 class Timer {
 
@@ -33,19 +62,19 @@ public:
         reset();
     }
 
-    // вернет время после reset|default constructor в секундах
+    // РІРµСЂРЅРµС‚ РІСЂРµРјСЏ РїРѕСЃР»Рµ reset|default constructor РІ СЃРµРєСѓРЅРґР°С…
     point_t time() const {
 
-        // разница тиков делить на частоту
+        // СЂР°Р·РЅРёС†Р° С‚РёРєРѕРІ РґРµР»РёС‚СЊ РЅР° С‡Р°СЃС‚РѕС‚Сѓ
         return (get_ticks() - start_tick) / performance_frequency;
     }
 
-    // обновит указатель времени
+    // РѕР±РЅРѕРІРёС‚ СѓРєР°Р·Р°С‚РµР»СЊ РІСЂРµРјРµРЅРё
     void reset() {
         start_tick = get_ticks();
     }
 
-    // вернет тик начала отсчета
+    // РІРµСЂРЅРµС‚ С‚РёРє РЅР°С‡Р°Р»Р° РѕС‚СЃС‡РµС‚Р°
     u64 get_tick() const {
         return start_tick;
     }

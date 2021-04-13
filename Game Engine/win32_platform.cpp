@@ -47,8 +47,6 @@
 #undef max
 #undef min
 
-#include "assert.h"
-
 #include "utils.h"
 
 #include "Objects/objects.h"
