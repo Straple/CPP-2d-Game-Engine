@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../utils.h"
 #include "matrix.h"
@@ -14,7 +14,7 @@ struct sprite {
 
     sprite() {}
 
-    // ñ÷èòûâàíèå ñïðàéòà
+    // ÑÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ð½Ð¸Ðµ ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð°
     sprite(std::string path) {
 
         std::ifstream input(path);
@@ -42,8 +42,8 @@ struct sprite {
             u32 len;
             input >> len;
             while (len--) {
-                u32 color, // öâåò
-                    point_count; // êîëè÷åñòâî òî÷åê
+                u32 color, // Ñ†Ð²ÐµÑ‚
+                    point_count; // ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ‚Ð¾Ñ‡ÐµÐº
 
                 input >> color >> point_count;
                 while (point_count--) {

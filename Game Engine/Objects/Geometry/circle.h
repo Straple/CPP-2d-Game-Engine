@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "dot.h"
 #include "../../utils.h"
@@ -22,7 +22,7 @@ struct Circle {
         return pos + dot(cos(angle), sin(angle)) * radius;
     }
 
-    // проверка принадлежности точки окружности
+    // РїСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С‚РѕС‡РєРё РѕРєСЂСѓР¶РЅРѕСЃС‚Рё
     bool ison(const dot& point) const {
         return (pos - point).getLen() == radius;
     }

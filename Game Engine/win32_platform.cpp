@@ -59,7 +59,7 @@ bool running        = true;
 bool fullscreen_mod = true;
 bool fullscreen_mod_is_changed = false;
 
-const bool debug_mode   = false;
+const bool debug_mode   = true;
 const bool camera_mod   = true; // simulate moves camera?
 const bool show_cursor  = false;
 const bool show_console = false;
@@ -337,7 +337,7 @@ int main() {
 
 				draw_object(int(delta_time * 1000), dot(20, 5) - arena_half_size, 0.5, 0xffffffff);
 
-				draw_object(global_time.time(), dot(35, 5) - arena_half_size, 0.5, 0xffffffff);
+				draw_object(global_time, dot(35, 5) - arena_half_size, 0.5, 0xffffffff);
 			}
 		}
 

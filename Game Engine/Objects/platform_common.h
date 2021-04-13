@@ -1,11 +1,11 @@
-#pragma once
+п»ї#pragma once
 
 struct Button_State {
-	bool is_down; // нажата
-	bool changed; // изменилась
+	bool is_down; // РЅР°Р¶Р°С‚Р°
+	bool changed; // РёР·РјРµРЅРёР»Р°СЃСЊ
 };
 
-// КНОПКИ
+// РљРќРћРџРљР
 enum button_t {
 	BUTTON_UP,
 	BUTTON_DOWN,

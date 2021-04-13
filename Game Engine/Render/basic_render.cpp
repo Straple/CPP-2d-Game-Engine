@@ -1,5 +1,5 @@
-
-// рисует в пикселях
+п»ї
+// СЂРёСЃСѓРµС‚ РІ РїРёРєСЃРµР»СЏС…
 void draw_pixels(u16 x0, u16 y0, u16 x1, u16 y1, const Color& color) {
 
 	if (x0 < x1 && y0 < y1) {
@@ -35,7 +35,7 @@ void draw_pixels(u16 x0, u16 y0, u16 x1, u16 y1, const Color& color) {
 	}
 }
 
-// рисует прямоугольник в пикселях с обработкой границ
+// СЂРёСЃСѓРµС‚ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє РІ РїРёРєСЃРµР»СЏС… СЃ РѕР±СЂР°Р±РѕС‚РєРѕР№ РіСЂР°РЅРёС†
 void draw_rect_in_pixels(s32 x0, s32 y0, s32 x1, s32 y1, const Color& color) {
 	x0 = clamp<s32>(0, x0, render_state.width);
 	x1 = clamp<s32>(0, x1, render_state.width);
@@ -46,7 +46,7 @@ void draw_rect_in_pixels(s32 x0, s32 y0, s32 x1, s32 y1, const Color& color) {
 	draw_pixels(x0, y0, x1, y1, color);
 }
 
-// зарисовывает весь экран этим цветом
+// Р·Р°СЂРёСЃРѕРІС‹РІР°РµС‚ РІРµСЃСЊ СЌРєСЂР°РЅ СЌС‚РёРј С†РІРµС‚РѕРј
 void clear_screen(const Color& color) {
 	draw_pixels(0, 0, render_state.width, render_state.height, color);
 }

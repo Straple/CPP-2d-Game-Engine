@@ -1,4 +1,4 @@
-#define is_down(b)  (input.buttons[b].is_down)
+п»ї#define is_down(b)  (input.buttons[b].is_down)
 #define pressed(b)  (is_down(b) && input.buttons[b].changed)
 #define released(b) (!is_down(b) && input.buttons[b].changed)
 
@@ -33,7 +33,7 @@ void simulate_physics(const Input& input, point_t delta_time) {
 
 	// simulate player
 	{
-		// накопление вектора движения
+		// РЅР°РєРѕРїР»РµРЅРёРµ РІРµРєС‚РѕСЂР° РґРІРёР¶РµРЅРёСЏ
 		auto accum_ddp = [&](point_t ddp_speed) -> dot {
 			return dot(is_down(BUTTON_D) - is_down(BUTTON_A), is_down(BUTTON_W) - is_down(BUTTON_S)) * ddp_speed;
 		};

@@ -1,7 +1,7 @@
-
-// функции внутри game objects
-// simulate - обновить объект
-// draw - рисовать объект
+п»ї
+// С„СѓРЅРєС†РёРё РІРЅСѓС‚СЂРё game objects
+// simulate - РѕР±РЅРѕРІРёС‚СЊ РѕР±СЉРµРєС‚
+// draw - СЂРёСЃРѕРІР°С‚СЊ РѕР±СЉРµРєС‚
 
 struct Bush {
 	dot pos;
@@ -35,13 +35,13 @@ struct Bush {
 
 struct Player {
 
-	// движение и позиция
+	// РґРІРёР¶РµРЅРёРµ Рё РїРѕР·РёС†РёСЏ
 	dot pos;
 	dot dp;
 
 	point_t size;
 
-	// дерево анимаций игрока
+	// РґРµСЂРµРІРѕ Р°РЅРёРјР°С†РёР№ РёРіСЂРѕРєР°
 	struct Player_anim_tree {
 		enum player_anim_t {
 			run_right,
@@ -89,9 +89,9 @@ struct Player {
 			animation(SP_player, 18, 1, 0.1, 64), // idle down
 		};
 
-		// возвращает анимацию
+		// РІРѕР·РІСЂР°С‰Р°РµС‚ Р°РЅРёРјР°С†РёСЋ
 		player_anim_t get_anim(dot dir, player_anim_t prevAnim) {
-			// дефолтная анимация
+			// РґРµС„РѕР»С‚РЅР°СЏ Р°РЅРёРјР°С†РёСЏ
 			if (prevAnim == none) {
 				return idle_right;
 			}
@@ -127,7 +127,7 @@ struct Player {
 		}
 	} player_anim_tree;
 
-	// предыдущая анимация
+	// РїСЂРµРґС‹РґСѓС‰Р°СЏ Р°РЅРёРјР°С†РёСЏ
 	Player_anim_tree::player_anim_t prev_anim = Player_anim_tree::idle_right;
 
 	Player(dot pos, point_t size) {
@@ -153,18 +153,18 @@ struct Player {
 
 		// simulate animation
 		{
-			// ddp - вектор направления игрока
+			// ddp - РІРµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ РёРіСЂРѕРєР°
 
-			// нужно понять какую анимацию воспроизводить
+			// РЅСѓР¶РЅРѕ РїРѕРЅСЏС‚СЊ РєР°РєСѓСЋ Р°РЅРёРјР°С†РёСЋ РІРѕСЃРїСЂРѕРёР·РІРѕРґРёС‚СЊ
 
-			// текущая анимация+
+			// С‚РµРєСѓС‰Р°СЏ Р°РЅРёРјР°С†РёСЏ+
 			auto current_anim = player_anim_tree.get_anim(ddp.normalize(), prev_anim);
 
-			if (prev_anim != current_anim) { // у нас сменились анимации
+			if (prev_anim != current_anim) { // Сѓ РЅР°СЃ СЃРјРµРЅРёР»РёСЃСЊ Р°РЅРёРјР°С†РёРё
 				prev_anim = current_anim;
 
 				player_anim_tree.Anims[current_anim].frame_time_accum = 0;
-				// начинаем с 1 кадра, чтобы мы сразу начинали движение
+				// РЅР°С‡РёРЅР°РµРј СЃ 1 РєР°РґСЂР°, С‡С‚РѕР±С‹ РјС‹ СЃСЂР°Р·Сѓ РЅР°С‡РёРЅР°Р»Рё РґРІРёР¶РµРЅРёРµ
 				player_anim_tree.Anims[current_anim].frame_count = std::min<u32>(1, player_anim_tree.Anims[current_anim].frame_size - 1);
 			}
 
@@ -182,7 +182,7 @@ struct Mouse {
 	point_t size;
 
 	dot pos;
-	dot focus_pos; // позиция точки, когда мы нажали на мышку и удерживали
+	dot focus_pos; // РїРѕР·РёС†РёСЏ С‚РѕС‡РєРё, РєРѕРіРґР° РјС‹ РЅР°Р¶Р°Р»Рё РЅР° РјС‹С€РєСѓ Рё СѓРґРµСЂР¶РёРІР°Р»Рё
 
 	bool focus = false;
 	bool is_down = false;
@@ -230,10 +230,10 @@ struct Mouse {
 	}
 };
 
-// текст с колизией
-struct button { // кнопка
+// С‚РµРєСЃС‚ СЃ РєРѕР»РёР·РёРµР№
+struct button { // РєРЅРѕРїРєР°
 	text_t text;
-	dot pos; // центр текста по x
+	dot pos; // С†РµРЅС‚СЂ С‚РµРєСЃС‚Р° РїРѕ x
 	point_t size;
 	collision_box coll;
 	Color color, // usual color
@@ -252,7 +252,7 @@ struct button { // кнопка
 		color = _color;
 		focus_color = _focus_color;
 
-		// !создать коллизию!
+		// !СЃРѕР·РґР°С‚СЊ РєРѕР»Р»РёР·РёСЋ!
 		{
 			int len = text_len(_text);
 
@@ -276,7 +276,7 @@ struct button { // кнопка
 		}
 	}
 
-	// обновит состояние фокуса мыши
+	// РѕР±РЅРѕРІРёС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ С„РѕРєСѓСЃР° РјС‹С€Рё
 	void simulate(Mouse* mouse) {
 		if (coll.trigger(mouse->pos)) {
 			mouse->focus = true;

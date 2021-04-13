@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "../../utils.h"
 
@@ -46,12 +46,12 @@ struct dot {
         return *this = *this / k;
     }
 
-    // векторное/косое произведение
-    // Это площадь параллелограмма
+    // РІРµРєС‚РѕСЂРЅРѕРµ/РєРѕСЃРѕРµ РїСЂРѕРёР·РІРµРґРµРЅРёРµ
+    // Р­С‚Рѕ РїР»РѕС‰Р°РґСЊ РїР°СЂР°Р»Р»РµР»РѕРіСЂР°РјРјР°
     point_t operator % (const dot& p) const {
         return x * p.y - y * p.x;
     }
-    // скалярное произведение
+    // СЃРєР°Р»СЏСЂРЅРѕРµ РїСЂРѕРёР·РІРµРґРµРЅРёРµ
     point_t operator * (const dot& p) const {
         return x * p.x + y * p.y;
     }
@@ -70,11 +70,11 @@ struct dot {
         return !(*this == Rhs);
     }
 
-    // самая левая, потом самая нижняя
+    // СЃР°РјР°СЏ Р»РµРІР°СЏ, РїРѕС‚РѕРј СЃР°РјР°СЏ РЅРёР¶РЅСЏСЏ
     bool operator < (const dot& Rhs) const {
         return x == Rhs.x ? y < Rhs.y : x < Rhs.x;
     }
-    // самая правая, потом самая верхняя
+    // СЃР°РјР°СЏ РїСЂР°РІР°СЏ, РїРѕС‚РѕРј СЃР°РјР°СЏ РІРµСЂС…РЅСЏСЏ
     bool operator > (const dot& Rhs) const {
         return x == Rhs.x ? y > Rhs.y : x > Rhs.x;
     }

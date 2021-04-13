@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "../utils.h"
 
@@ -15,10 +15,10 @@
 template<typename T>
 class matrix {
     T* memory;
-    u32 rowLen; // колво строк
-    u32 colLen; // колво столбцов
+    u32 rowLen; // РєРѕР»РІРѕ СЃС‚СЂРѕРє
+    u32 colLen; // РєРѕР»РІРѕ СЃС‚РѕР»Р±С†РѕРІ
 
-    // обнуление
+    // РѕР±РЅСѓР»РµРЅРёРµ
     void zeroing() {
         memory = 0;
         rowLen = colLen = 0;

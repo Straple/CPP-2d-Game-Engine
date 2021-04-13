@@ -1,4 +1,4 @@
-
+﻿
 #include "dot.h"
 
 #include "circle.h"

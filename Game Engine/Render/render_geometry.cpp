@@ -1,8 +1,8 @@
-
+п»ї
 void draw_rect(dot pos, dot half_size, const Color& color) {
 	pos += arena_half_size;
 
-	// масштабирование
+	// РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ
 	pos *= scale_factor;
 	half_size *= scale_factor;
 
@@ -21,7 +21,7 @@ void draw_rect2(dot top_left, dot bottom_right, const Color& color) {
 	top_left += arena_half_size;
 	bottom_right += arena_half_size;
 
-	// масштабирование
+	// РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ
 	top_left *= scale_factor;
 	bottom_right *= scale_factor;
 

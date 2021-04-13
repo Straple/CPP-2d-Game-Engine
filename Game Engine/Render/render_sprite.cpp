@@ -1,17 +1,17 @@
-
+п»ї
 void static_pos_update(dot& pos, bool is_static) {
 	if (!is_static) {
 		pos -= camera.pos;
 	}
 }
 
-// проверяет пересечение экрана и этого прямоугольника
+// РїСЂРѕРІРµСЂСЏРµС‚ РїРµСЂРµСЃРµС‡РµРЅРёРµ СЌРєСЂР°РЅР° Рё СЌС‚РѕРіРѕ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°
 bool arena_query(point_t left, point_t right, point_t top, point_t bottom) {
 	return !(right < -arena_half_size.x || arena_half_size.x < left || // x
 		     top < -arena_half_size.y || arena_half_size.y < bottom); // y
 }
 
-// рисует спрайт
+// СЂРёСЃСѓРµС‚ СЃРїСЂР°Р№С‚
 void draw_sprite(dot pos, point_t size, sprite_t sprite, u8 alpha = 0xff, bool is_static = !camera_mod) {
 
 	static_pos_update(pos, is_static);
@@ -38,8 +38,8 @@ void draw_sprite(dot pos, point_t size, sprite_t sprite, u8 alpha = 0xff, bool i
 	}
 }
 
-// рисует текстуру
-// x_cnt, y_cnt - колво спрайтов по координатам
+// СЂРёСЃСѓРµС‚ С‚РµРєСЃС‚СѓСЂСѓ
+// x_cnt, y_cnt - РєРѕР»РІРѕ СЃРїСЂР°Р№С‚РѕРІ РїРѕ РєРѕРѕСЂРґРёРЅР°С‚Р°Рј
 void draw_texture(dot pos, u32 x_cnt, u32 y_cnt, point_t size, sprite_t texture, u8 alpha = 0xff) {
 
 	static_pos_update(pos, !camera_mod);
@@ -61,9 +61,9 @@ void draw_texture(dot pos, u32 x_cnt, u32 y_cnt, point_t size, sprite_t texture,
 	}
 }
 
-// рисует спрайт из листа спрайтов
-// len_x - длина спрайта по x
-// sprite_count - идентификатор спрайта
+// СЂРёСЃСѓРµС‚ СЃРїСЂР°Р№С‚ РёР· Р»РёСЃС‚Р° СЃРїСЂР°Р№С‚РѕРІ
+// len_x - РґР»РёРЅР° СЃРїСЂР°Р№С‚Р° РїРѕ x
+// sprite_count - РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРїСЂР°Р№С‚Р°
 void draw_spritesheet(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u32 sprite_count, u8 alpha = 0xff) {
 
 	static_pos_update(pos, !camera_mod);

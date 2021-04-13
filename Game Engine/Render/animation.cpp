@@ -1,16 +1,16 @@
-
+ï»¿
 
 struct animation {
-	sprite_t sprite_sheet; // ëèñò ñïðàéòîâ
+	sprite_t sprite_sheet; // Ð»Ð¸ÑÑ‚ ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð¾Ð²
 
-	u32 frame_begin; // íà÷àëî êàäðà â ëèñòå ñïðàéòîâ
-	u32 frame_size; // êîëè÷åñòâî êàäðîâ â àíèìàöèè
-	u32 frame_count; // ñ÷åò÷èê òåêóùåãî êàäðà ñ 0
+	u32 frame_begin; // Ð½Ð°Ñ‡Ð°Ð»Ð¾ ÐºÐ°Ð´Ñ€Ð° Ð² Ð»Ð¸ÑÑ‚Ðµ ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð¾Ð²
+	u32 frame_size; // ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÐºÐ°Ð´Ñ€Ð¾Ð² Ð² Ð°Ð½Ð¸Ð¼Ð°Ñ†Ð¸Ð¸
+	u32 frame_count; // ÑÑ‡ÐµÑ‚Ñ‡Ð¸Ðº Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ ÐºÐ°Ð´Ñ€Ð° Ñ 0
 
-	point_t frame_duration; // ïðîäîëæèòåëüíîñòü êàäðà
-	point_t frame_time_accum; // âðåìÿ íàêîïëåíèÿ äî ïðîäîëæèòåëüíîñòè êàäðà
+	point_t frame_duration; // Ð¿Ñ€Ð¾Ð´Ð¾Ð»Ð¶Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚ÑŒ ÐºÐ°Ð´Ñ€Ð°
+	point_t frame_time_accum; // Ð²Ñ€ÐµÐ¼Ñ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ Ð´Ð¾ Ð¿Ñ€Ð¾Ð´Ð¾Ð»Ð¶Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚Ð¸ ÐºÐ°Ð´Ñ€Ð°
 
-	u32 len_x; // äëèíà ñïðàéòà îäíîãî êàäðà ïî x
+	u32 len_x; // Ð´Ð»Ð¸Ð½Ð° ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð° Ð¾Ð´Ð½Ð¾Ð³Ð¾ ÐºÐ°Ð´Ñ€Ð° Ð¿Ð¾ x
 
 	animation(sprite_t sprite_sheet, u32 frame_begin, u32 frame_size, point_t frame_duration, u32 len_x) {
 		this->sprite_sheet = sprite_sheet;

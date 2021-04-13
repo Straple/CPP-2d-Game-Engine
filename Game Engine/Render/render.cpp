@@ -1,7 +1,7 @@
+п»ї
+point_t render_scale = 0.01; // РјР°СЃС€С‚Р°Р± СЂРµРЅРґРµСЂРёРЅРіР°
 
-point_t render_scale = 0.01; // масштаб рендеринга
-
-point_t scale_factor = 0; // множитель масштабирования = render_state.height * render_scale
+point_t scale_factor = 0; // РјРЅРѕР¶РёС‚РµР»СЊ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ = render_state.height * render_scale
 
 #include "basic_render.cpp"
 

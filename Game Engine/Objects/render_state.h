@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include <windows.h>
 #include "../utils.h"
@@ -6,12 +6,12 @@
 struct Render_state {
     u32 height, width;
 
-    Color* render_memory; // память для рендера
+    Color* render_memory; // РїР°РјСЏС‚СЊ РґР»СЏ СЂРµРЅРґРµСЂР°
     u32 render_memory_len = 0;
 
     BITMAPINFO bitmap_info;
 
-    // изменение размеров окна
+    // РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
     void resize(u32 w, u32 h) {
         width = w;
         height = h;
@@ -20,7 +20,7 @@ struct Render_state {
         {
             u64 size = static_cast<u64>(w) * h;
 
-            if (render_memory_len < size) { // не хватает памяти
+            if (render_memory_len < size) { // РЅРµ С…РІР°С‚Р°РµС‚ РїР°РјСЏС‚Рё
                 delete[] render_memory;
                 render_memory = new Color[size];
                 render_memory_len = size;

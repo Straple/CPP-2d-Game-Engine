@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "../utils.h"
 
@@ -52,7 +52,7 @@ struct Color {
         b = calc_color(a, b);
     }
 
-    // накладывает на этот цвет color
+    // РЅР°РєР»Р°РґС‹РІР°РµС‚ РЅР° СЌС‚РѕС‚ С†РІРµС‚ color
     Color combine(const Color& color) const {
 
         u8 inv_alpha = 0xff - color.a;

@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include "Geometry/geometry.h"
 
@@ -62,7 +62,7 @@ struct collision_circle {
 		this->circle = circle;
 	}
 
-	// выталкивает pos за пределы круга
+	// РІС‹С‚Р°Р»РєРёРІР°РµС‚ pos Р·Р° РїСЂРµРґРµР»С‹ РєСЂСѓРіР°
 	void bubble(dot* pos) const {
 		if (circle.isin(*pos)) {
 			dot vector = (*pos - circle.pos).normalize() * circle.radius;

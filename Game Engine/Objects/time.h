@@ -79,3 +79,6 @@ public:
         return start_tick;
     }
 };
+std::ostream& operator << (std::ostream& output, const Timer& time) {
+    return output << time.time() << "s";
+}

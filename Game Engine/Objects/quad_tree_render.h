@@ -1,12 +1,12 @@
-#pragma once
+п»ї#pragma once
 
 #include "../utils.h"
 #include "color.h"
 
-// дерево квадрантов для рендеринга
+// РґРµСЂРµРІРѕ РєРІР°РґСЂР°РЅС‚РѕРІ РґР»СЏ СЂРµРЅРґРµСЂРёРЅРіР°
 class quad_tree_render {
     struct node {
-        char type; // 0 - ничего, 1 - лист, 2 - need push
+        char type; // 0 - РЅРёС‡РµРіРѕ, 1 - Р»РёСЃС‚, 2 - need push
         Color color;
 
         node() {
@@ -18,12 +18,12 @@ class quad_tree_render {
         }
 
         void update(const Color& new_color) {
-            if (type != 0) { // вершина лист или нуждается в проталкивании
+            if (type != 0) { // РІРµСЂС€РёРЅР° Р»РёСЃС‚ РёР»Рё РЅСѓР¶РґР°РµС‚СЃСЏ РІ РїСЂРѕС‚Р°Р»РєРёРІР°РЅРёРё
                 color = color.combine(new_color);
             }
             else {
                 color = new_color;
-                type = 2; // лист был где-то ниже, поэтому этот узел нуждается в обновлении
+                type = 2; // Р»РёСЃС‚ Р±С‹Р» РіРґРµ-С‚Рѕ РЅРёР¶Рµ, РїРѕСЌС‚РѕРјСѓ СЌС‚РѕС‚ СѓР·РµР» РЅСѓР¶РґР°РµС‚СЃСЏ РІ РѕР±РЅРѕРІР»РµРЅРёРё
             }
         }
     };
@@ -33,57 +33,57 @@ class quad_tree_render {
 
 
     void push(u32 v, u32 left, u32 right, u32 top, u32 bottom) {
-        // нужно протолкнуть и !(это единичный квадрат или ошибка в границах)
+        // РЅСѓР¶РЅРѕ РїСЂРѕС‚РѕР»РєРЅСѓС‚СЊ Рё !(СЌС‚Рѕ РµРґРёРЅРёС‡РЅС‹Р№ РєРІР°РґСЂР°С‚ РёР»Рё РѕС€РёР±РєР° РІ РіСЂР°РЅРёС†Р°С…)
         if (tree[v].type != 0 && !(left >= right && top >= bottom)) {
-            if (tree[v].type == 1) { // это лист
+            if (tree[v].type == 1) { // СЌС‚Рѕ Р»РёСЃС‚
 
                 if (left == right) {
-                    // это вертикальная линия
+                    // СЌС‚Рѕ РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ Р»РёРЅРёСЏ
                     tree[(v << 2) + 1] = tree[(v << 2) + 3] = tree[v];
                 }
                 else if (top == bottom) {
-                    // это горизонтальная линия
+                    // СЌС‚Рѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅР°СЏ Р»РёРЅРёСЏ
                     tree[(v << 2) + 1] = tree[(v << 2) + 2] = tree[v];
                 }
                 else {
-                    // это норм прямоугольник
+                    // СЌС‚Рѕ РЅРѕСЂРј РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
                     for (u32 i = 1; i <= 4; i++) {
                         tree[(v << 2) + i] = tree[v];
                     }
                 }
             }
-            else if (tree[v].type == 2) { // нужно протолкнуть
+            else if (tree[v].type == 2) { // РЅСѓР¶РЅРѕ РїСЂРѕС‚РѕР»РєРЅСѓС‚СЊ
                 if (left == right) {
-                    // это вертикальная линия
+                    // СЌС‚Рѕ РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ Р»РёРЅРёСЏ
                     tree[(v << 2) + 1].update(tree[v].color);
                     tree[(v << 2) + 3].update(tree[v].color);
                 }
                 else if (top == bottom) {
-                    // это горизонтальная линия
+                    // СЌС‚Рѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅР°СЏ Р»РёРЅРёСЏ
                     tree[(v << 2) + 1].update(tree[v].color);
                     tree[(v << 2) + 2].update(tree[v].color);
                 }
                 else {
-                    // это норм прямоугольник
+                    // СЌС‚Рѕ РЅРѕСЂРј РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
                     for (u32 i = 1; i <= 4; i++) {
                         tree[(v << 2) + i].update(tree[v].color);
                     }
                 }
             }
 
-            tree[v].type = 0; // теперь это пустой узел
+            tree[v].type = 0; // С‚РµРїРµСЂСЊ СЌС‚Рѕ РїСѓСЃС‚РѕР№ СѓР·РµР»
         }
     }
 
-#define cur_quest qleft, qright, qtop, qbottom, color // текущие границы запроса и цвет
+#define cur_quest qleft, qright, qtop, qbottom, color // С‚РµРєСѓС‰РёРµ РіСЂР°РЅРёС†С‹ Р·Р°РїСЂРѕСЃР° Рё С†РІРµС‚
 
-#define top_left (v << 2) + 1, left, xmid, top, ymid // переход в левого верхнего сына
+#define top_left (v << 2) + 1, left, xmid, top, ymid // РїРµСЂРµС…РѕРґ РІ Р»РµРІРѕРіРѕ РІРµСЂС…РЅРµРіРѕ СЃС‹РЅР°
 
-#define bottom_left (v << 2) + 3, left, xmid, ymid + 1, bottom // переход в левого нижнего сына
+#define bottom_left (v << 2) + 3, left, xmid, ymid + 1, bottom // РїРµСЂРµС…РѕРґ РІ Р»РµРІРѕРіРѕ РЅРёР¶РЅРµРіРѕ СЃС‹РЅР°
 
-#define top_right (v << 2) + 2, xmid + 1, right, top, ymid // переход в правого верхнего сына
+#define top_right (v << 2) + 2, xmid + 1, right, top, ymid // РїРµСЂРµС…РѕРґ РІ РїСЂР°РІРѕРіРѕ РІРµСЂС…РЅРµРіРѕ СЃС‹РЅР°
 
-#define bottom_right (v << 2) + 4, xmid + 1, right, ymid + 1, bottom // переход в правого нижнего сына
+#define bottom_right (v << 2) + 4, xmid + 1, right, ymid + 1, bottom // РїРµСЂРµС…РѕРґ РІ РїСЂР°РІРѕРіРѕ РЅРёР¶РЅРµРіРѕ СЃС‹РЅР°
 
     void paint(u32 v, // vertex
         u32 left, u32 right, // x border
@@ -95,7 +95,7 @@ class quad_tree_render {
         if (left == qleft && right == qright &&  // x
             top == qtop && bottom == qbottom) {// y
 
-            // если в этой вершине находятся действенные цвета
+            // РµСЃР»Рё РІ СЌС‚РѕР№ РІРµСЂС€РёРЅРµ РЅР°С…РѕРґСЏС‚СЃСЏ РґРµР№СЃС‚РІРµРЅРЅС‹Рµ С†РІРµС‚Р°
             if (tree[v].type != 0) {
                 tree[v].color = tree[v].color.combine(color);
             }
@@ -112,8 +112,8 @@ class quad_tree_render {
         else {
             push(v, left, right, top, bottom);
 
-            u32 xmid = (left + right) >> 1; // центр по x
-            u32 ymid = (top + bottom) >> 1; // центр по y
+            u32 xmid = (left + right) >> 1; // С†РµРЅС‚СЂ РїРѕ x
+            u32 ymid = (top + bottom) >> 1; // С†РµРЅС‚СЂ РїРѕ y
 
             if (qright <= xmid) { // left
 
@@ -170,10 +170,10 @@ class quad_tree_render {
     void copy_colors(u32 v, // vertex
         u32 left, u32 right, // x border
         u32 top, u32 bottom, // y border
-        u32* dest) { // куда копировать
+        u32* dest) { // РєСѓРґР° РєРѕРїРёСЂРѕРІР°С‚СЊ
 
         if (tree[v].type == 1) {
-            // пришли в лист. Он полностью красит данный прямоугольник в какой-то цвет
+            // РїСЂРёС€Р»Рё РІ Р»РёСЃС‚. РћРЅ РїРѕР»РЅРѕСЃС‚СЊСЋ РєСЂР°СЃРёС‚ РґР°РЅРЅС‹Р№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє РІ РєР°РєРѕР№-С‚Рѕ С†РІРµС‚
 
             u32 color = static_cast<u32>(tree[v].color);
             u32 len = right - left + 1;
@@ -189,8 +189,8 @@ class quad_tree_render {
         else {
             push(v, left, right, top, bottom);
 
-            u32 xmid = (left + right) >> 1; // центр по x
-            u32 ymid = (top + bottom) >> 1; // центр по y
+            u32 xmid = (left + right) >> 1; // С†РµРЅС‚СЂ РїРѕ x
+            u32 ymid = (top + bottom) >> 1; // С†РµРЅС‚СЂ РїРѕ y
 
             copy_colors(top_left, dest);
             copy_colors(top_right, dest);

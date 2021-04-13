@@ -1,4 +1,4 @@
-
+﻿
 void draw_rain(u32 count_water) {
 	clear_screen(Color(0, 0, 255, 16));
 
