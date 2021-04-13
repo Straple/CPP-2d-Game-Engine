@@ -88,3 +88,6 @@ struct dot {
         }
     }
 };
+std::ostream& operator << (std::ostream& output, const dot& p) {
+    return output << '(' << p.x << ", " << p.y << ")";
+}

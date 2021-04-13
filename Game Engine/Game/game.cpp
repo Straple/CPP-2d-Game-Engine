@@ -6,27 +6,33 @@
 
 // global variables
 
-Mouse mouse(SP_cursor, SP_focus_cursor, 0.09);
-
-Player player(dot(0, 0), 0.5);
+Player player;
 
 std::vector<Bush> Bushes = {
-	Bush(dot(-10, -10), 0.5),
-	Bush(dot(-60, 10), 0.5),
-	Bush(dot(20, -70), 0.5),
-	Bush(dot(35, -10), 0.5),
-	Bush(dot(-50, -40), 0.5),
-	Bush(dot(-40, -10), 0.5),
-	Bush(dot(8, 50), 0.5),
-	Bush(dot(-20, 10), 0.5),
-	Bush(dot(-39, 25), 0.5),
-	Bush(dot(40, 50), 0.5),
+	Bush(dot(-10, -10)),
+	Bush(dot(-60, 10)),
+	Bush(dot(20, -70)),
+	Bush(dot(35, -10)),
+	Bush(dot(-50, -40)),
+	Bush(dot(-40, -10)),
+	Bush(dot(8, 50)),
+	Bush(dot(-20, 10)),
+	Bush(dot(-39, 25)),
+	Bush(dot(40, 50)),
 };
 
-collision_box box(dot(-10, 10), dot(10, -10));
+std::vector<Slime> Slimes = {
+	Slime(dot(30, -12)),
+	Slime(dot(-20, 7)),
+};
+
+
+
+Mouse mouse(SP_cursor, SP_focus_cursor, 0.09);
+
+collision_box box(dot(-20, -30), dot(10, -40));
 
 button btn("click", dot(), 1, 0xffffffff, 0xffff0000, false);
-
 
 
 void simulate_physics(const Input& input, point_t delta_time) {
@@ -34,16 +40,56 @@ void simulate_physics(const Input& input, point_t delta_time) {
 	// simulate player
 	{
 		// накопление вектора движения
-		auto accum_ddp = [&](point_t ddp_speed) -> dot {
-			return dot(is_down(BUTTON_D) - is_down(BUTTON_A), is_down(BUTTON_W) - is_down(BUTTON_S)) * ddp_speed;
+		auto accum_ddp = [&input]() -> dot {
+			return dot(is_down(BUTTON_D) - is_down(BUTTON_A), is_down(BUTTON_W) - is_down(BUTTON_S));
 		};
 
-		player.simulate(delta_time, accum_ddp(500));
+		player.simulate(delta_time, accum_ddp());
 
 		box.bubble(&player.pos);
 
 		for (auto& bush : Bushes) {
-			bush.simulate(&player.pos);
+			bush.get_collision().bubble(&player.pos);
+		}
+	}
+
+	// simulate slimes
+	{
+		for (auto& slime : Slimes) {
+			slime.simulate(player.pos, delta_time);
+		}
+
+		for (auto& slime1 : Slimes) {
+			for (auto& slime2 : Slimes) {
+
+				// slime1 выталкивает slime2
+
+				// позиция атакующего слайма статична
+				if (&slime1 != &slime2 && !slime2.is_attack) {
+					collision_circle coll = Circle(slime1.pos, /*!!!*/ 2 * SLIME_COLLISION_RADIUS);
+					coll.bubble(&slime2.pos);
+				}
+			}
+		}
+
+		// box
+		for (auto& slime : Slimes) {
+			if (!slime.is_attack) {
+				box.bubble(&slime.pos);
+			}
+		}
+
+		// bushes
+		for (auto& bush : Bushes) {
+
+			auto collision = bush.get_collision();
+			collision.circle.radius += SLIME_COLLISION_RADIUS;
+
+			for (auto& slime : Slimes) {
+				if (!slime.is_attack) {
+					collision.bubble(&slime.pos);
+				}
+			}
 		}
 	}
 
@@ -51,7 +97,7 @@ void simulate_physics(const Input& input, point_t delta_time) {
 
 	mouse.simulate(input);
 
-	btn.simulate(&mouse);
+	//btn.simulate(&mouse);
 }
 
 void render_game(const Input& input) {
@@ -60,20 +106,66 @@ void render_game(const Input& input) {
 
 	draw_texture(dot(-50, 20), 4, 2, 0.5, SP_grass_background);
 
-	// draw player and bushes
+	// draw player, slimes and bushes
 	{
-		for (auto& bush : Bushes) {
-			if (bush.pos.y > player.pos.y) {
-				bush.draw();
+		// то что выше рисуем первым
+
+		std::sort(Bushes.begin(), Bushes.end(), [](const Bush& Lhs, const Bush& Rhs) -> bool {
+			return Lhs.pos.y > Rhs.pos.y;
+		});
+
+		std::sort(Slimes.begin(), Slimes.end(), [](const Slime& Lhs, const Slime& Rhs) -> bool {
+			return Lhs.pos.y > Rhs.pos.y;
+		});
+
+		u32 bush_i, slime_i;
+		bush_i = slime_i = 0;
+
+		bool player_is_draw = false;
+
+		while (bush_i < Bushes.size() && slime_i < Slimes.size()) {
+
+			// игрок не был нарисован и он выше остальных
+			if (!player_is_draw && 
+				player.pos.y == std::max({ player.pos.y, Bushes[bush_i].pos.y, Slimes[slime_i].pos.y })) {
+				
+				player_is_draw = true;
+				player.draw();
+			}
+			else if(Bushes[bush_i].pos.y > Slimes[slime_i].pos.y) {
+				Bushes[bush_i].draw();
+				bush_i++;
+			}
+			else {
+				Slimes[slime_i].draw();
+				slime_i++;
+			}
+		}
+		
+		while (bush_i < Bushes.size()) {
+			if (!player_is_draw && player.pos.y > Bushes[bush_i].pos.y) {
+				player_is_draw = true;
+				player.draw();
+			}
+			else {
+				Bushes[bush_i].draw();
+				bush_i++;
 			}
 		}
 
-		player.draw();
-
-		for (auto& bush : Bushes) {
-			if (bush.pos.y <= player.pos.y) {
-				bush.draw();
+		while (slime_i < Slimes.size()) {
+			if (!player_is_draw && player.pos.y > Slimes[slime_i].pos.y) {
+				player_is_draw = true;
+				player.draw();
 			}
+			else {
+				Slimes[slime_i].draw();
+				slime_i++;
+			}
+		}
+		
+		if (!player_is_draw) {
+			player.draw();
 		}
 	}
 	
@@ -88,11 +180,10 @@ void render_game(const Input& input) {
 		draw_rect2(pos0, pos1, 0x30ffffff);
 	}
 	
-
 	mouse.draw();
 
 	// draw button and button count
-	{
+	/*{
 		static u32 cnt = 0;
 		if (btn.coll.trigger(mouse.pos) && pressed(BUTTON_MOUSE_L)) {
 			cnt++;
@@ -101,7 +192,7 @@ void render_game(const Input& input) {
 		btn.draw();
 
 		draw_object(cnt, dot(20, 20), 1, 0xffffffff);
-	}
+	}*/
 
 
 	if (is_down(BUTTON_MOUSE_L)) {
@@ -118,6 +209,7 @@ void render_game(const Input& input) {
 
 	/*draw_object(camera.pos.x, dot(), 1, 0xffffffff);
 	draw_object(camera.pos.y, dot(0, 18), 1, 0xffffffff);*/
+	
 }
 
 void simulate_game(const Input& input, point_t delta_time) {
@@ -171,7 +263,10 @@ void simulate_game(const Input& input, point_t delta_time) {
 		fullscreen_mod_is_changed = true;
 	}
 
-	
+	if (pressed(BUTTON_K)) {
+		debug_mode = !debug_mode;
+	}
+
 	simulate_physics(input, delta_time);
 
 	render_game(input);

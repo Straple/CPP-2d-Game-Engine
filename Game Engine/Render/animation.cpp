@@ -22,6 +22,11 @@ struct animation {
 		frame_time_accum = 0;
 	}
 
+	void reset() {
+		frame_count = 0;
+		frame_time_accum = 0;
+	}
+
 	void frame_update(point_t delta_time) {
 		frame_time_accum += delta_time;
 		if (frame_time_accum > frame_duration) {
@@ -33,8 +38,8 @@ struct animation {
 		}
 	}
 
-	void draw(dot pos, point_t size) {
-		draw_spritesheet(pos, size, sprite_sheet, len_x, frame_begin + frame_count);
+	void draw(dot pos, point_t size, u8 alpha = 0xff) {
+		draw_spritesheet(pos, size, sprite_sheet, len_x, frame_begin + frame_count, alpha);
 	}
 };
 

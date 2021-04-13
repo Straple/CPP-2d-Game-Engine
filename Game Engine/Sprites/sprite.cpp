@@ -20,6 +20,9 @@ enum sprite_t {
 	SP_medium_shadow,
 	SP_large_shadow,
 
+	SP_slime,
+	SP_slime_small_shadow,
+	SP_slime_large_shadow,
 
 	SP_COUNT,
 };
@@ -41,6 +44,10 @@ void init_sprites() {
 	init(SP_grass_background, "grass_background.esg");
 	init(SP_medium_shadow, "medium_shadow.eng");
 	init(SP_large_shadow, "large_shadow.eng");
+
+	init(SP_slime, "slime.eng");
+	init(SP_slime_small_shadow, "slime_small_shadow.eng");
+	init(SP_slime_large_shadow, "slime_large_shadow.eng");
 	// ...
 
 #undef init

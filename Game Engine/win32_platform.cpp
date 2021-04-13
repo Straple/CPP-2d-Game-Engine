@@ -59,10 +59,10 @@ bool running        = true;
 bool fullscreen_mod = true;
 bool fullscreen_mod_is_changed = false;
 
-const bool debug_mode   = true;
+bool debug_mode   = false;
 const bool camera_mod   = true; // simulate moves camera?
 const bool show_cursor  = false;
-const bool show_console = false;
+const bool show_console = true;
 
 // global variables
 
