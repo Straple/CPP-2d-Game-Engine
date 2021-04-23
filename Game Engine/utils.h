@@ -96,3 +96,11 @@ void fill(u32* dest, u32 val32, u32 len) {
 		dest[len - 1] = val32;
 	}
 }
+
+bool randomness(u32 percent) {
+	ASSERT(0 <= percent && percent <= 100, "wrong percent");
+
+	std::uniform_int_distribution<u32> rnd_range(0, 100);
+
+	return rnd_range(rnd) <= percent;
+}

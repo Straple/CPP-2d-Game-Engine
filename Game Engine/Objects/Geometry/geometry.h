@@ -1,4 +1,6 @@
 ﻿
+#define PI acos(-1)
+
 #include "dot.h"
 
 #include "circle.h"

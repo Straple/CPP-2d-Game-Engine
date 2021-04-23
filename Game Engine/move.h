@@ -3,7 +3,6 @@
 #include "utils.h"
 #include "Objects/Geometry/dot.h"
 
-
 void simulate_move(point_t& p, point_t& dp, point_t ddp, point_t dt) {
 	ddp -= dp * 15;
 	p = p + dp * dt + ddp * quare(dt) * 0.5;
@@ -44,3 +43,40 @@ void move_to2d(dot& p, const dot& p_to, dot& dp, dot ddp, point_t dt) {
     move_to(p.x, p_to.x, dp.x, ddp.x, dt);
     move_to(p.y, p_to.y, dp.y, ddp.y, dt);
 }
+
+enum class direction_t {
+
+    // DON'T SHUFFLE THIS CODE
+
+    NONE,
+
+    RIGHT,
+    UP,
+    LEFT,
+    DOWN,
+
+    COUNT,
+};
+
+dot get_direction(direction_t dir) {
+    ASSERT(dir != direction_t::COUNT, "wrong direction");
+
+    switch (dir) {
+        case direction_t::NONE: {
+            return dot();
+        }
+        case direction_t::RIGHT: {
+            return dot(1, 0);
+        }
+        case direction_t::UP: {
+            return dot(0, 1);
+        }
+        case direction_t::LEFT: {
+            return dot(-1, 0);
+        }
+        case direction_t::DOWN: {
+            return dot(0, -1);
+        }
+    }
+}
+

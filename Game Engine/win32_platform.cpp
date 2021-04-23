@@ -1,4 +1,61 @@
-﻿
+﻿/*			
+
+
+
+
+
+										+------+
+										|dot   |
+				+----------+			|rect  |
+				|   file   |			|line  |----------------+
+				|png or eng|			|circle|				|
+				+----------+			+------+				|
+					|						|					|
+					|						|					|
+	+-----+		+------+			+----------------+		+---------+		+----+		+---------------+
+	|color|-----|sprite|			|geometry objects|		|collision|		|time|		|platform common|
+	+-----+		+------+			+----------------+		+---------+		+----+		+---------------+
+					|						|					|				|			|
+					|						|					|				|			|
+					|				+-------------+				|				|			|
+					+---------------|engine object|-------------+---------------+-----------+
+									+-------------+																		+------+
+											|																	+-------|logics|
+											|																	|		+------+
+											|																	|
+			+----+					++===========++															+------------+				+------+
+			|GAME|<=================||GAME ENGINE||---------------------------------------------------------|game objects|--------------|sprite|
+			+----+					++===========++															+------------+				+------+
+											|	|																	|
+											|	+-----------------------------------+								+-------+
+											|										|										|
+					+------------+		+------+								+-------+								+---------+
+					|render state|------|render|						+-------|physics|-----------+					|collision|
+					+------------+		+------+						|		+-------+			|					+---------+
+											|							|			|				|
+											|							|			|				|
+										+------------+				+----+		+---------+		+----+
+										|basic render|				|time|		|collision|		|move|
+										+------------+				+----+		+---------+		+----+
+											|
+											|
+									+---------------+
+					+---------------|render geometry|-------------------+
+					|				+---------------+					|
+					|						|							|
+					|						|							|
+				+-----------+			+-------------+			+---------------+
+				|render text|			|render sprite|			|render phenomen|
+				+-----------+			+-------------+			+---------------+
+											|
+											|
+										+---------+
+										|animation|
+										+---------+
+ 
+ 
+*/
+
 /*
 *       y ^
 *         |
@@ -60,7 +117,8 @@ bool fullscreen_mod = true;
 bool fullscreen_mod_is_changed = false;
 
 bool debug_mode   = false;
-const bool camera_mod   = true; // simulate moves camera?
+bool show_locator = false;
+const bool camera_mod = true; // simulate moves camera?
 const bool show_cursor  = false;
 const bool show_console = true;
 
@@ -235,7 +293,7 @@ int main() {
 
 	ShowCursor(show_cursor);
 
-	init_sprites();
+	read_sprites();
 
 	// Create Window class
 	WNDCLASS window_class = {};
@@ -285,6 +343,8 @@ int main() {
 	// дескриптор устройства (DC) для клиентской области указанного окна или для всего экрана
 	// Используется в последующих функциях GDI для рисования в DС
 	HDC hdc = GetDC(window); 
+
+	build_world();
 
 	Input input = {};
 

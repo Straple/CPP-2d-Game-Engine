@@ -63,37 +63,37 @@
 "0   0",
 "0   0",
 
-"0", // i
+"  0", // i
 "",
-"0",
-"0",
-"0",
-"0",
-"0",
+"  0",
+"  0",
+"  0",
+"  0",
+"00000",
 
-"  0", // j
+"    0", // j
 "",
-"000",
-"  0",
-"  0",
-"  0",
-" 0",
+"  000",
+"    0",
+"    0",
+" 0  0",
+"  00",
 
 "0", // k
 "0",
-"0  0",
+"0  0 ",
 "0 0",
 "00",
 "0 0",
 "0  0",
 
-"0", // l
-"0",
-"0",
-"0",
-"0",
-"0",
-"0",
+"000", // l
+"  0",
+"  0",
+"  0",
+"  0",
+"  0",
+"00000",
 
 "",
 "",
@@ -153,11 +153,11 @@
 
 " 0", // t
 " 0",
-"000",
+"0000",
 " 0",
 " 0",
 " 0",
-"  00",
+"  000",
 
 "",
 "",
@@ -208,82 +208,82 @@
 "00000",
 };
 text_t letters[][7] = {
-" 000",
-"0   0", // A
+" 000", // A
+"0   0", 
 "0   0",
 "0   0",
 "00000",
 "0   0",
 "0   0",
 
-"0000",
+"0000", // B
 "0   0",
-"0   0", // B
+"0   0", 
 "0000",
 "0   0",
 "0   0",
 "0000",
 
+" 000", // C
+"0   0",
+"0", 
+"0",
+"0",
+"0   0",
 " 000",
-"0   0",
-"0", // C
-"0",
-"0",
-"0   0",
-" 000",
 
 
-"0000",
+"0000", // D
 "0   0",
-"0   0", // D
+"0   0", 
 "0   0",
 "0   0",
 "0   0",
 "0000",
 
-"00000",
+"00000", // E
 "0",
-"0",		// E
+"0",
 "0000",
 "0",
 "0",
 "00000",
 
-"00000",
+"00000", // F
 "0",
-"0",		// F
+"0",
 "0000",
 "0",
 "0",
 "0",
 
-" 000",
+" 000", // G
 "0   0",
-"0",		// G
+"0",
 "0 000",
 "0   0",
 "0   0",
 " 000",
 
+"0   0", // H
 "0   0",
 "0   0",
-"0   0",	// H
 "00000",
 "0   0",
 "0   0",
 "0   0",
 
-"000",
-" 0",
-" 0",		// I
-" 0",
-" 0",
-" 0",
-"000",
+"00000", // I
+"  0",
+"  0",
+"  0",
+"  0",
+"  0",
+"00000",
 
-"  000",
+"  000", // J
 "    0",
-"    0",	 // J
+"    0",
 "    0",
 "    0",
 "0   0",
@@ -297,9 +297,9 @@ text_t letters[][7] = {
 "0  0",
 "0   0",
 
-"0",
-"0",
 "0", // L
+"0",
+"0",
 "0",
 "0",
 "0",
@@ -323,18 +323,18 @@ text_t letters[][7] = {
 "0   0",
 
 
-" 000 ",
+" 000 ", // O
 "0   0",
-"0   0", // O
+"0   0",
 "0   0",
 "0   0",
 "0   0",
 " 000",
 
 
-"0000",
+"0000", // P
 "0   0",
-"0   0", // P
+"0   0",
 "0000",
 "0",
 "0",
@@ -367,9 +367,9 @@ text_t letters[][7] = {
 "0000",
 
 
-"00000",
+"00000", // T
 "  0",
-"  0", // T
+"  0",
 "  0",
 "  0",
 "  0",
@@ -401,9 +401,9 @@ text_t letters[][7] = {
 " 0 0",
 
 
+"0   0", // X
 "0   0",
-"0   0",
-" 0 0", // X
+" 0 0",
 "  0",
 " 0 0",
 "0   0",
@@ -435,13 +435,13 @@ text_t digits[][7] = {
 "0   0",
 " 000",
 
-" 0", // 1
-"00",
-" 0",
-" 0",
-" 0",
-" 0",
-" 0",
+"  0", // 1
+" 00",
+"  0",
+"  0",
+"  0",
+"  0",
+"00000",
 
 " 000", // 2
 "0   0",
@@ -511,7 +511,7 @@ text_t symbols[][7] = {
 "", // -
 "",
 "",
-" 000",
+" 000 ",
 "",
 "",
 "",
@@ -519,7 +519,7 @@ text_t symbols[][7] = {
 "", // +
 "",
 "  0",
-" 000",
+" 000 ",
 "  0",
 "",
 "",
@@ -530,23 +530,31 @@ text_t symbols[][7] = {
 "",
 "",
 "",
-"0",
+"  0  ",
 
-"0",
-"0",
-"0",
-"0",
-"0",
+"  0  ", // !
+"  0  ",
+"  0  ",
+"  0  ",
+"  0  ",
 "",
-"0",
+"  0  ",
 
-" 000",
+" 000", // ?
 "0   0",
 "    0",
 "   0",
 "  0",
 "",
 "  0",
+
+"  0  ", // |
+"  0  ",
+"  0  ",
+"  0  ",
+"  0  ",
+"  0  ",
+"  0  ",
 };
 text_t unused_character[][7] = {
 "00000",
@@ -559,35 +567,39 @@ text_t unused_character[][7] = {
 };
 
 text_t* get_symbol(char symbol) {
-	if (is_between('0', symbol, '9')) { // digit
-		return digits[symbol - '0'];
-	}
-	else if (is_between('a', symbol, 'z')) { // small letter
+	if (is_between('a', symbol, 'z')) { // small letter
 		return small_letters[symbol - 'a'];
 	}
 	else if (is_between('A', symbol, 'Z')) { // letter
 		return letters[symbol - 'A'];
 	}
+	else if (is_between('0', symbol, '9')) { // digit
+		return digits[symbol - '0'];
+	}
 	else { // symbol
 
-		if (symbol == '-') { // -
-			return symbols[0];
+		switch (symbol) {
+			case '-': {
+				return symbols[0];
+			}
+			case '+': {
+				return symbols[1];
+			}
+			case '.': {
+				return symbols[2];
+			}
+			case '!': {
+				return symbols[3];
+			}
+			case '?': {
+				return symbols[4];
+			}
+			case '|': {
+				return symbols[5];
+			}
 		}
-		else if (symbol == '+') {
-			return symbols[1];
-		}
-		else if (symbol == '.') { // .
-			return symbols[2];
-		}
-		else if (symbol == '!') { // !
-			return symbols[3];
-		}
-		else if (symbol == '?') { // ?
-			return symbols[4];
-		}
-		else {
-			return unused_character[0];
-		}
+
+		return unused_character[0];
 	}
 }
 
@@ -600,25 +612,28 @@ s32 symbol_len(char symbol) {
 
 		auto memory = get_symbol(symbol);
 		for (u32 i = 0; i < 7; i++) {
-			auto row = memory[i];
 
-			for (s32 j = 1; *row; j++, row++) {
-				if (*row == '0' && right_x < j) {
-					right_x = j;
-				}
-			}
+			right_x = std::max<s32>(right_x, strlen(memory[i]));
 		}
 		return right_x + 1;
 	}
 }
 
 s32 text_len(text_t text) {
+	s32 max_len = 0;
 	s32 len = 0;
 	while (*text) {
-		len += symbol_len(*text);
+		if (*text == '\n') {
+			max_len = std::max(max_len, len);
+			len = 0;
+		}
+		else {
+			len += symbol_len(*text);
+		}
 		text++;
 	}
-	return len;
+	max_len = std::max(max_len, len);
+	return max_len;
 }
 
 s32 sprite_len(sprite_t sprite) {
@@ -627,7 +642,7 @@ s32 sprite_len(sprite_t sprite) {
 
 	for (u32 i = 0; i < pixels.getRowLen(); i++) {
 		for (u32 j = 0; j < pixels.getColLen(); j++) {
-			if (pixels[i][j].is_draw && right_x < j) {
+			if (is_draw(pixels[i][j]) && right_x < j) {
 				right_x = j;
 			}
 		}

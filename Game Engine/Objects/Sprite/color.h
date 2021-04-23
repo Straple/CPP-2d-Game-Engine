@@ -1,17 +1,6 @@
 ﻿#pragma once
 
-#include "../utils.h"
-
-//u8* build_dp_blend() {
-//    u8* dp = new u8[256 * 256];
-//
-//    for (u32 alpha = 0; alpha <= 0xff; alpha++) {
-//        for (u32 c = 0; c <= 0xff; c++) {
-//            dp[(alpha << 8) + c] = alpha * c / 0xff;
-//        }
-//    }
-//    return dp;
-//}
+#include "../../utils.h"
 
 // 0xAARRGGBB
 // [a, r, g, b]
@@ -23,7 +12,7 @@ struct Color {
     u8 r; // red
     u8 a; // alpha
 
-#define calc_color(alpha, c) (static_cast<u16>(alpha) * c / 255)
+#define calc_color(alpha, c) ((static_cast<u32>(alpha) * c) / 255)
 
 
     Color() {
@@ -44,8 +33,8 @@ struct Color {
         b = calc_color(alpha, b);
         a = alpha;
     }
-    Color(u32 rgba) {
-        *reinterpret_cast<u32*>(this) = rgba;
+    Color(u32 argb) {
+        *reinterpret_cast<u32*>(this) = argb;
 
         r = calc_color(a, r);
         g = calc_color(a, g);
@@ -72,3 +61,9 @@ struct Color {
         return static_cast<u32>(r << 16) + (g << 8) + b;
     }
 };
+
+bool is_draw(const Color& color) {
+    return color.a != 0;
+}
+
+#define WHITE Color(0xffffffff)

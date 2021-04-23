@@ -19,7 +19,6 @@ void draw_symbol(char symbol, dot pos, point_t size, const Color& color) {
 				if (*row == '0') {
 					draw_rect(pos, half_size, color);
 				}
-
 				pos.x += size;
 			}
 			pos.y -= size;
@@ -31,9 +30,18 @@ void draw_symbol(char symbol, dot pos, point_t size, const Color& color) {
 // рисует текст
 void draw_text(text_t text, dot pos, point_t size, const Color& color) {
 
+	point_t original_x = pos.x;
+
 	while (*text) {
-		draw_symbol(*text, pos, size, color);
-		pos.x += size * symbol_len(*text);
+		if (*text == '\n') {
+			pos.y -= size * 9;
+			pos.x = original_x;
+		}
+		else {
+			draw_symbol(*text, pos, size, color);
+			pos.x += size * symbol_len(*text);
+		}
+		
 		text++;
 	}
 }

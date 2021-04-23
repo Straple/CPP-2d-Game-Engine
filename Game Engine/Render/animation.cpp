@@ -3,16 +3,17 @@
 struct animation {
 	sprite_t sprite_sheet; // лист спрайтов
 
-	u32 frame_begin; // начало кадра в листе спрайтов
-	u32 frame_size; // количество кадров в анимации
-	u32 frame_count; // счетчик текущего кадра с 0
+	u8 frame_begin; // начало кадра в листе спрайтов
+	u8 frame_size; // количество кадров в анимации
+	u8 frame_count; // счетчик текущего кадра с 0
+	u8 len_x; // длина спрайта одного кадра по x
 
 	point_t frame_duration; // продолжительность кадра
 	point_t frame_time_accum; // время накопления до продолжительности кадра
 
-	u32 len_x; // длина спрайта одного кадра по x
+	animation() {}
 
-	animation(sprite_t sprite_sheet, u32 frame_begin, u32 frame_size, point_t frame_duration, u32 len_x) {
+	animation(sprite_t sprite_sheet, u8 frame_begin, u8 frame_size, point_t frame_duration, u8 len_x) {
 		this->sprite_sheet = sprite_sheet;
 		this->frame_begin = frame_begin;
 		this->frame_size = frame_size;
@@ -38,8 +39,9 @@ struct animation {
 		}
 	}
 
-	void draw(dot pos, point_t size, u8 alpha = 0xff) {
-		draw_spritesheet(pos, size, sprite_sheet, len_x, frame_begin + frame_count, alpha);
+	template<typename func_t = Color(const Color& color)>
+	void draw(dot pos, point_t size, func_t&& func = standart_pixel_func) const {
+
+		draw_spritesheet(pos, size, sprite_sheet, len_x, frame_begin + frame_count, func);
 	}
 };
-

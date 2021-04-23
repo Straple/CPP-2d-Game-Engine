@@ -3,7 +3,7 @@
 
 // basic objects
 
-#include "color.h"
+#include "Sprite\sprite.h"
 
 #include "time.h"
 
@@ -20,8 +20,6 @@
 // complex objects
 
 #include "camera.h"
-
-#include "sprite.h"
 
 
 // render objects
