@@ -1,53 +1,38 @@
 // visibility
 #define SLIME_ALPHA 210
-#define SLIME_SIZE 0.4
-#define SLIME_DELTA_DRAW_POS dot(-30, 38) * SLIME_SIZE
+#define SLIME_DELTA_DRAW_POS dot(-30, 38) * gobj_state.size
 #define SLIME_FRAME_DURATION 1.0 / 7
 
-// physics
-#define SLIME_DDP_SPEED 250
+// animations
+#define SLIME_ANIM_ATTACK animation(SP_SLIME, 25, 30, SLIME_FRAME_DURATION, 64)
+#define SLIME_ANIM_IDLE animation(SP_SLIME, 0, 24, SLIME_FRAME_DURATION, 64)
+
 #define SLIME_PUSH_DP 400
-#define SLIME_DIST_JUMP 8
 
-// radius
-#define SLIME_COLLISION_RADIUS 3
-#define SLIME_LOCATOR_RADIUS 30
-#define SLIME_PERSEC_RADIUS 40 // преследование
-
-// times
-#define SLIME_ATTACK_COOLDOWN 3
-#define SLIME_PARALYZED_COOLDOWN 0.3
-#define SLIME_WALK 2
-#define SLIME_WALK_SUM 3
-
-// settings
-#define SLIME_HP 150
-
-#define SLIME_DAMAGE 100
 
 struct Slime {
 
+	inline static const game_object_state gobj_state = game_object_state(150, 5, 0.4);
+
+	inline static const enemy_state enemy_state = enemy_state(100, 3, 30, 40, 8, 250, 0.3, 3, 2, 3);
+
 	// pos and move
 	dot pos;
-	dot ddp;
 	dot dp;
+	dot ddp;
 
 	dot walk_to;
 
 	// cooldowns
-	point_t attack_cooldown_accum = SLIME_ATTACK_COOLDOWN;
-	point_t paralyzed_cooldown_accum = SLIME_PARALYZED_COOLDOWN;
+	point_t attack_cooldown_accum = enemy_state.attack_cooldown;
+	point_t paralyzed_cooldown_accum = enemy_state.paralyzed_cooldown;
 	point_t walk_accum = 0;
 
 	// settings
-	s32 hp = SLIME_HP;
-	static const s32 exp_cnt = 5;
-	s32 target = -1; // цели преследования нет
+	s16 hp = gobj_state.hp;
+	s16 target = -1; // цели преследования нет
 
-
-	// animation
-	animation idle = animation(SP_SLIME, 0, 24, SLIME_FRAME_DURATION, 64);
-	animation attack = animation(SP_SLIME, 25, 30, SLIME_FRAME_DURATION, 64);
+	animation anim = SLIME_ANIM_IDLE;
 
 	// boolean
 	bool is_attack = false;
@@ -56,18 +41,18 @@ struct Slime {
 	Slime(const dot& p) {
 		walk_to = pos = p;
 		std::uniform_int_distribution<s64> random_range(1, 1000);
-		walk_accum = (random_range(rnd) / 1000.0) * SLIME_WALK_SUM;
+		walk_accum = (random_range(rnd) / 1000.0) * enemy_state.walk_sum_time;
 	}
 
 	collision_circle get_collision() const {
-		return Circle(pos, SLIME_COLLISION_RADIUS);
+		return Circle(pos, enemy_state.collision_radius);
 	}
 
 	void simulate(point_t delta_time) {
 		paralyzed_cooldown_accum += delta_time;
 		attack_cooldown_accum += delta_time;
 
-		if (paralyzed_cooldown_accum < SLIME_PARALYZED_COOLDOWN) {
+		if (paralyzed_cooldown_accum < enemy_state.paralyzed_cooldown) {
 			simulate_move2d(pos, dp, ddp, delta_time);
 		}
 		else {
@@ -77,23 +62,19 @@ struct Slime {
 
 				Player& player = Players[target];
 
-				u32 prev_frame_count = attack.frame_count;
-
-				attack.frame_update(delta_time);
-
 				// анимация атаки закончилась
-				if (prev_frame_count > attack.frame_count) {
+				if (anim.frame_update(delta_time)) {
 					// idle animation beginner
 
 					player.is_paralyzed = is_attack = false; // позиция игрока не статична и не анимация атаки
 
 					attack_cooldown_accum = 0; // cooldown reset
 
-					idle.reset(); // новая анимация
+					anim = SLIME_ANIM_IDLE;
 				}
 
 				// шарик лопнул
-				if (attack.frame_count > 25 && player.is_paralyzed) {
+				if (anim.frame_count > 25 && player.is_paralyzed) {
 
 					// push player
 					player.dp = Circle(dot(), SLIME_PUSH_DP).get_random_dot();
@@ -101,38 +82,37 @@ struct Slime {
 					player.is_paralyzed = false; // у игрока не статическая позиция
 					player.paralyzed_cooldown_acc = 0; // перезарядка
 
-					player.hp -= SLIME_DAMAGE;
+					player.hp -= enemy_state.damage;
 
-					add_hit_effect(player.pos + dot(-8, 16) * PLAYER_SIZE);
+					add_hit_effect(player.pos + dot(-8, 16) * player.gobj_state.size);
 				}
 			}
 			else {
-				idle.frame_update(delta_time);
+				anim.frame_update(delta_time);
+
+				auto bad_target = [&](s16 target, point_t radius) -> bool {
+					ASSERT(target >= 0, "wrong target");
+
+					return Players[target].is_paralyzed || Players[target].is_jumped ||
+						(Players[target].pos - pos).getLen() > radius;
+				};
 
 				// цель потеряна
-				if (target != -1 && (Players[target].is_paralyzed || (Players[target].pos - pos).getLen() > SLIME_PERSEC_RADIUS)) {
+				if (target != -1 && bad_target(target, enemy_state.persec_radius)) {
 					target = -1;
-					walk_accum = SLIME_WALK;
+					walk_accum = enemy_state.walk_time;
 				}
 
 				if (target == -1) { // цели нет
 
 					// поищем
 
-					// найдем самого близжайшего игрока
+					// найдем самого близжайшего подходящего игрока
 					for(s32 i = 0; i < Players.size(); i++) {
-						if (Players[i].is_paralyzed) {
-							continue;
-						}
 
-						if (target == -1 || (Players[target].pos - pos).getLen() > (Players[i].pos - pos).getLen()) {
+						if(!bad_target(i, target != -1 ? (Players[target].pos - pos).getLen() : enemy_state.locator_radius)){
 							target = i;
 						}
-					}
-
-					// не подходит. Слишком далеко
-					if (target != -1 && (Players[target].pos - pos).getLen() > SLIME_LOCATOR_RADIUS) {
-						target = -1;
 					}
 				}
 
@@ -140,13 +120,13 @@ struct Slime {
 
 					auto& player = Players[target];
 
-					move_to2d(pos, player.pos, dp, (player.pos - pos).normalize() * SLIME_DDP_SPEED, delta_time);
+					move_to2d(pos, player.pos, dp, (player.pos - pos).normalize() * enemy_state.ddp_speed, delta_time);
 
 					// игрока никто не ест и мы близко к игроку и
-					if (!player.is_paralyzed && (player.pos - pos).getLen() <= SLIME_DIST_JUMP &&
+					if (!player.is_paralyzed && (player.pos - pos).getLen() <= enemy_state.jump_radius &&
 
 						// и перезарядка атаки прошла и перезарядка игрока тоже
-						attack_cooldown_accum >= SLIME_ATTACK_COOLDOWN && player.paralyzed_cooldown_acc >= PLAYER_STATICPOS_COOLDOWN) {
+						attack_cooldown_accum >= enemy_state.attack_cooldown && player.paralyzed_cooldown_acc >= PLAYER_STATICPOS_COOLDOWN) {
 
 						// attack animation beginner
 
@@ -154,7 +134,7 @@ struct Slime {
 
 						pos = player.pos; // прыгаем на игрока
 
-						attack.reset(); // новая анимация
+						anim = SLIME_ANIM_ATTACK;
 					}
 				}
 				else {
@@ -166,13 +146,13 @@ struct Slime {
 						walk_to = Circle(pos, 20).get_random_dot();
 					}
 
-					if (walk_accum > SLIME_WALK_SUM) {
+					if (walk_accum > enemy_state.walk_sum_time) {
 						walk_accum = 0;
 						walk_to = Circle(pos, 20).get_random_dot();
 					}
 
-					if (walk_accum < SLIME_WALK) {
-						move_to2d(pos, walk_to, dp, (walk_to - pos).normalize() * SLIME_DDP_SPEED, delta_time);
+					if (walk_accum < enemy_state.walk_time) {
+						move_to2d(pos, walk_to, dp, (walk_to - pos).normalize() * enemy_state.ddp_speed, delta_time);
 					}
 				}
 			}
@@ -182,19 +162,19 @@ struct Slime {
 	void draw() const {
 
 		if (is_attack) {
-			if (attack.frame_count >= 9 && attack.frame_count <= 25) {
-				draw_sprite(pos + SLIME_DELTA_DRAW_POS, SLIME_SIZE, SP_SLIME_LARGE_SHADOW, shadow_pixel_func);
+			if (is_between<u8>(9, anim.frame_count, 25)) {
+				draw_sprite(pos + SLIME_DELTA_DRAW_POS, gobj_state.size, SP_SLIME_LARGE_SHADOW, shadow_pixel_func);
 			}
 			else {
-				draw_sprite(pos + SLIME_DELTA_DRAW_POS, SLIME_SIZE, SP_SLIME_MEDIUM_SHADOW, shadow_pixel_func);
+				draw_sprite(pos + SLIME_DELTA_DRAW_POS, gobj_state.size, SP_SLIME_MEDIUM_SHADOW, shadow_pixel_func);
 			}
-			attack.draw(pos + SLIME_DELTA_DRAW_POS, SLIME_SIZE, alpha_pixel_func<SLIME_ALPHA>);
+			anim.draw(pos + SLIME_DELTA_DRAW_POS, gobj_state.size, alpha_pixel_func<SLIME_ALPHA>);
 		}
 		else {
-			draw_sprite(pos + SLIME_DELTA_DRAW_POS, SLIME_SIZE, SP_SLIME_MEDIUM_SHADOW, shadow_pixel_func);
+			draw_sprite(pos + SLIME_DELTA_DRAW_POS, gobj_state.size, SP_SLIME_MEDIUM_SHADOW, shadow_pixel_func);
 
-			idle.draw(pos + SLIME_DELTA_DRAW_POS, SLIME_SIZE, [&](Color color) {
-				return paralyzed_cooldown_accum < SLIME_PARALYZED_COOLDOWN ? 
+			anim.draw(pos + SLIME_DELTA_DRAW_POS, gobj_state.size, [&](Color color) {
+				return paralyzed_cooldown_accum < enemy_state.paralyzed_cooldown ? 
 					WHITE :
 					Color(color.operator u32(), SLIME_ALPHA);
 			});
@@ -204,20 +184,20 @@ struct Slime {
 
 		draw_hp(*this);
 
-		if (show_locator) {
+		if (eng_state.show_locator()) {
 			dot p = pos;
-			static_pos_update(p, !camera_mod);
+			static_pos_update(p);
 
-			draw_circle(Circle(p, SLIME_PERSEC_RADIUS), Color(0xf000f0, 64));
+			draw_circle(Circle(p, enemy_state.persec_radius), Color(0xf000f0, 64));
 
-			draw_circle(Circle(p, SLIME_LOCATOR_RADIUS), Color(0xfff000, 32));
+			draw_circle(Circle(p, enemy_state.locator_radius), Color(0xfff000, 32));
 
-			draw_circle(Circle(p, SLIME_DIST_JUMP), Color(0xff0000, 16));
+			draw_circle(Circle(p, enemy_state.jump_radius), Color(0xff0000, 16));
 
 			draw_object(walk_accum, p, 0.4, 0xffffffff);
 			
 			p = walk_to;
-			static_pos_update(p, !camera_mod);
+			static_pos_update(p);
 
 			draw_rect(p, dot(0.3, 0.3), 0xffff0000);
 		}
@@ -228,15 +208,15 @@ struct Slime {
 			return;
 		}
 
-		add_hit_effect(pos + dot(-8, 8) * SLIME_SIZE);
+		add_hit_effect(pos + dot(-8, 8) * gobj_state.size);
 
 		hp -= player.damage;
 
 		if (hp <= 0) {
-			add_death_effect(pos + dot(-15, 15) * SLIME_SIZE);
+			add_death_effect(pos + dot(-15, 15) * gobj_state.size);
 		}
 		else {
-			ddp += player.get_dir() * SLIME_DDP_SPEED * 1.5;
+			ddp += player.get_dir() * enemy_state.ddp_speed * 1.5;
 			paralyzed_cooldown_accum = 0;
 		}
 	}

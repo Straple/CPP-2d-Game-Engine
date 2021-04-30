@@ -1,17 +1,14 @@
 ﻿
 void draw_rect(dot pos, dot half_size, const Color& color) {
-	pos += arena_half_size;
 
-	// масштабирование
-	pos *= scale_factor;
-	half_size *= scale_factor;
+	// high accuracy
 
 	// change to pixels
-	s32 x0 = static_cast<s32>(pos.x - half_size.x);
-	s32 y0 = static_cast<s32>(pos.y - half_size.y);
+	s32 x0 = static_cast<s32>(((pos.x - half_size.x) + arena_half_size.x) * scale_factor);
+	s32 y0 = static_cast<s32>(((pos.y - half_size.y) + arena_half_size.y) * scale_factor);
 
-	s32 x1 = static_cast<s32>(pos.x + half_size.x);
-	s32 y1 = static_cast<s32>(pos.y + half_size.y);
+	s32 x1 = static_cast<s32>(((pos.x + half_size.x) + arena_half_size.x) * scale_factor);
+	s32 y1 = static_cast<s32>(((pos.y + half_size.y) + arena_half_size.y) * scale_factor);
 
 	draw_rect_in_pixels(x0, y0, x1, y1, color);
 }
@@ -27,10 +24,10 @@ void draw_rect2(dot top_left, dot bottom_right, const Color& color) {
 
 	// change to pixels
 	s32 x0 = static_cast<s32>(top_left.x);
-	s32 y0 = static_cast<s32>(top_left.y);
+	s32 y0 = static_cast<s32>(bottom_right.y);
 
 	s32 x1 = static_cast<s32>(bottom_right.x);
-	s32 y1 = static_cast<s32>(bottom_right.y);
+	s32 y1 = static_cast<s32>(top_left.y);
 
 	draw_rect_in_pixels(x0, y0, x1, y1, color);
 }

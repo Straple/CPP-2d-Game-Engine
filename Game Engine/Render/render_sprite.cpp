@@ -5,6 +5,10 @@ void static_pos_update(dot& pos, bool is_static) {
 	}
 }
 
+void static_pos_update(dot& pos) {
+	static_pos_update(pos, !eng_state.camera_mode());
+}
+
 // проверяет пересечение экрана и этого прямоугольника
 bool arena_query(point_t left, point_t right, point_t top, point_t bottom) {
 	return !(right < -arena_half_size.x || arena_half_size.x < left || // x
@@ -15,7 +19,7 @@ bool arena_query(point_t left, point_t right, point_t top, point_t bottom) {
 if (is_draw(color)) {\
 	draw_rect(pos, half_size, func(color));\
 }\
-else if (debug_mode) {\
+else if (eng_state.debug_mode()) {\
 	draw_rect(pos, half_size, Color(0xffffff, 60));\
 }
 
@@ -33,7 +37,6 @@ Color alpha_pixel_func(const Color& color) {
 template<typename func_t = Color(const Color& color)>
 void draw_sprite_static(dot pos, point_t size, sprite_t sprite, func_t&& func = standart_pixel_func) {
 
-	point_t original_x = pos.x;
 	dot half_size = dot(0.5, 0.5) * size;
 
 	auto& pixels = Sprites[sprite].picture;
@@ -41,13 +44,12 @@ void draw_sprite_static(dot pos, point_t size, sprite_t sprite, func_t&& func = 
 	if (arena_query(pos.x - half_size.x, pos.x + pixels.getColLen() * size + half_size.x,
 		pos.y + half_size.y, pos.y - pixels.getRowLen() * size - half_size.y)) {
 
-		for (u32 i = 0; i < pixels.getRowLen(); i++) {
-			for (u32 j = 0; j < pixels.getColLen(); j++, pos.x += size) {
+		for (s32 i = 0; i < pixels.getRowLen(); i++) {
+			for (s32 j = 0; j < pixels.getColLen(); j++) {
 
-				simulate_draw_pixel(pixels[i][j], pos, half_size);
+				simulate_draw_pixel(pixels[i][j], dot(pos.x + j * size, pos.y), half_size);
 			}
 			pos.y -= size;
-			pos.x = original_x;
 		}
 	}
 }
@@ -55,7 +57,7 @@ void draw_sprite_static(dot pos, point_t size, sprite_t sprite, func_t&& func = 
 template<typename func_t = Color(const Color& color)>
 void draw_sprite(dot pos, point_t size, sprite_t sprite, func_t&& func = standart_pixel_func) {
 
-	static_pos_update(pos, !camera_mod);
+	static_pos_update(pos);
 
 	draw_sprite_static(pos, size, sprite, func);
 }
@@ -67,31 +69,37 @@ void draw_sprite(dot pos, point_t size, sprite_t sprite, func_t&& func = standar
 template<typename func_t = Color(const Color& color)>
 void draw_texture(dot pos, u32 x_cnt, u32 y_cnt, point_t size, sprite_t texture, func_t&& func = standart_pixel_func) {
 
-	const point_t original_x = pos.x;
-
 	auto& pixels = Sprites[texture].picture;
 
 	const point_t x_summary = pixels.getColLen() * size;
 	const point_t y_summary = pixels.getRowLen() * size;
 
 	for (u32 i = 0; i < y_cnt; i++) {
-		for (u32 j = 0; j < x_cnt; j++, pos.x += x_summary) {
-			draw_sprite(pos, size, texture, func);
+		for (u32 j = 0; j < x_cnt; j++) {
+			draw_sprite(dot(pos.x + x_summary * j, pos.y), size, texture, func);
 		}
-		pos.x = original_x;
 		pos.y -= y_summary;
 	}
+}
+
+// x_cnt, y_cnt - колво спрайтов по координатам
+template<typename func_t = Color(const Color& color)>
+void draw_texture_align(dot pos, u32 x_cnt, u32 y_cnt, point_t size, sprite_t texture, func_t&& func = standart_pixel_func) {
+
+	auto& pixels = Sprites[texture].picture;
+
+	const point_t x_summary = pixels.getColLen() * size;
+	const point_t y_summary = pixels.getRowLen() * size;
+
+	draw_texture(pos + dot(-x_summary * x_cnt * 0.5, y_summary * y_cnt * 0.5), x_cnt, y_cnt, size, texture, func);
 }
 
 // рисует спрайт из листа спрайтов
 // len_x - длина спрайта по x
 // sprite_count - идентификатор спрайта
 template<typename func_t = Color(const Color& color)>
-void draw_spritesheet(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u32 sprite_count, func_t&& func = standart_pixel_func) {
+void draw_spritesheet_static(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u32 sprite_count, func_t&& func = standart_pixel_func) {
 
-	static_pos_update(pos, !camera_mod);
-
-	point_t original_x = pos.x;
 	dot half_size = dot(0.5, 0.5) * size;
 
 	auto& pixels = Sprites[spritesheet].picture;
@@ -104,12 +112,22 @@ void draw_spritesheet(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u3
 
 		for (u32 i = 0; i < pixels.getRowLen(); i++) {
 
-			for (u32 j = begin_x; j < end_x; j++, pos.x += size) {
+			for (u32 j = begin_x; j < end_x; j++) {
 
-				simulate_draw_pixel(pixels[i][j], pos, half_size);
+				simulate_draw_pixel(pixels[i][j], dot(pos.x + size * (j - begin_x), pos.y), half_size);
 			}
 			pos.y -= size;
-			pos.x = original_x;
 		}
 	}
+}
+
+// рисует спрайт из листа спрайтов
+// len_x - длина спрайта по x
+// sprite_count - идентификатор спрайта
+template<typename func_t = Color(const Color& color)>
+void draw_spritesheet(dot pos, point_t size, sprite_t spritesheet, u32 len_x, u32 sprite_count, func_t&& func = standart_pixel_func) {
+
+	static_pos_update(pos);
+
+	draw_spritesheet_static(pos, size, spritesheet, len_x, sprite_count, func);
 }

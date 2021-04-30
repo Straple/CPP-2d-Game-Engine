@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 // basic objects
 
 #include "Sprite\sprite.h"
@@ -27,3 +26,7 @@
 // #include "quad_tree_render.h" not used
 
 #include "render_state.h"
+
+// states
+
+#include "engine_state.h"

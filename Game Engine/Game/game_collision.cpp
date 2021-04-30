@@ -61,10 +61,9 @@ void simulate_game_collision(container_t& Objects) {
 	else { // obj is slime or player
 
 		// players
-		for (auto& obj : Objects) {
-			for (auto& player : Players) {
-				if (verify_others_obj(player, obj) && typeid(obj) != typeid(Slime)) {
-
+		if (typeid(Objects.back()) != typeid(Slime) && typeid(Objects.back()) != typeid(Player)) {
+			for (auto& obj : Objects) {
+				for (auto& player : Players) {
 					update_collision(player, obj.get_collision());
 				}
 			}

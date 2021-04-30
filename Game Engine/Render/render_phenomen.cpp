@@ -25,6 +25,8 @@ struct Fire_machine {
 	point_t mult_color_dec;
 	point_t time_color_dec;
 
+	point_t cooldown_add_accum = 0;
+
 	Fire_machine(){}
 	Fire_machine(const dot& pos, point_t size, point_t cooldown_add, point_t mult_size_dec, point_t mult_color_dec, point_t time_color_dec) {
 		this->pos = pos;
@@ -34,8 +36,32 @@ struct Fire_machine {
 		this->mult_color_dec = mult_color_dec;
 		this->time_color_dec = time_color_dec;
 	}
+	Fire_machine(const char* memory) {
 
-	point_t cooldown_add_accum = 0;
+#define read(obj, type)\
+obj = *reinterpret_cast<const type*>(memory);\
+memory += sizeof(type);
+
+
+		read(pos, dot);
+		read(size, point_t);
+
+		read(cooldown_add, point_t);
+		read(mult_size_dec, point_t);
+		read(mult_color_dec, point_t);
+		read(time_color_dec, point_t);
+
+		read(cooldown_add_accum, point_t);
+
+		Rhombus.resize(*reinterpret_cast<const u32*>(memory));
+		memory += sizeof(u32);
+
+		for (u32 i = 0; i < Rhombus.size(); i++) {
+			Rhombus[i] = reinterpret_cast<const rhombus*>(memory)[i];
+		}
+
+#undef write
+	}
 
 	struct rhombus {
 		dot pos;
@@ -43,6 +69,52 @@ struct Fire_machine {
 		point_t time;
 		bool is_smoke;
 	};
+
+	std::vector<rhombus> Rhombus;
+
+	u32 get_mem_len() {
+		u32 res = sizeof(rhombus) * Rhombus.size();
+		res += sizeof(u32);
+
+		res += sizeof(pos);
+		res += sizeof(size);
+
+		res += sizeof(cooldown_add);
+		res += sizeof(mult_size_dec);
+		res += sizeof(mult_color_dec);
+		res += sizeof(time_color_dec);
+
+		res += sizeof(cooldown_add_accum);
+
+		return res;
+	}
+
+	// заполняет указатель данной структурой
+	void fill_mem(char* memory) {
+
+#define write(obj, type)\
+*reinterpret_cast<type*>(memory) = obj;\
+memory += sizeof(type);
+
+		write(pos, dot);
+		write(size, point_t);
+
+		write(cooldown_add, point_t);
+		write(mult_size_dec, point_t);
+		write(mult_color_dec, point_t);
+		write(time_color_dec, point_t);
+
+		write(cooldown_add_accum, point_t);
+
+		write(Rhombus.size(), u32);
+
+		for (u32 i = 0; i < Rhombus.size(); i++) {
+			reinterpret_cast<rhombus*>(memory)[i] = Rhombus[i];
+		}
+
+#undef write
+	}
+
 
 	point_t get_size(const rhombus& item) const {
 		point_t res = size - item.time * mult_size_dec;
@@ -52,12 +124,11 @@ struct Fire_machine {
 		return res;
 	}
 
-
-	s32 get_u8 (const rhombus& item) const {
+	s32 get_u8(const rhombus& item) const {
 		return 0xff - item.time / time_color_dec * mult_color_dec;
 	}
 	Color get_color(const rhombus& item) const {
-		
+
 		if (item.is_smoke) {
 			return Color(0xff - get_u8(item), 0xff - get_u8(item), 0xff - get_u8(item), 196);
 		}
@@ -65,8 +136,6 @@ struct Fire_machine {
 			return Color(0xff, get_u8(item), 0);
 		}
 	}
-
-	std::vector<rhombus> Rhombus;
 
 	void simulate(point_t delta_time) {
 
@@ -108,9 +177,8 @@ struct Fire_machine {
 	void draw() const {
 		for (auto& item : Rhombus) {
 			dot p = item.pos;
-			static_pos_update(p, !camera_mod);
+			static_pos_update(p, !eng_state.camera_mode());
 			draw_rhombus(p, dot(1, 1) * get_size(item), get_color(item));
 		}
 	}
-
 };

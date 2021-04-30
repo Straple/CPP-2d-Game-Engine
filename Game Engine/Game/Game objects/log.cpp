@@ -1,19 +1,19 @@
 
-#define LOG_SIZE 0.3
-
-#define LOG_DELTA_DRAW_POS dot(-30, 18) * LOG_SIZE
-
-#define LOG_RADIUS 4
+#define LOG_DELTA_DRAW_POS dot(-30, 18) * gobj_state.size
 
 #define LOG_DP_SPEED 200
 
 struct Log {
 
+	inline static const game_object_state gobj_state = game_object_state(1, 0, 0.3);
+
+	inline static const point_t collision_radius = 4;
+
+	inline static const s16 hp = 1;
+
 	dot pos;
 	dot dp;
 
-	static const s32 exp_cnt = 0;
-	static const s32 hp = 1; // бессмертный
 
 	Log(){}
 	Log(const dot& p) {
@@ -21,7 +21,7 @@ struct Log {
 	}
 
 	collision_circle get_collision() const {
-		return Circle(pos, LOG_RADIUS);
+		return Circle(pos, collision_radius);
 	}
 
 	void simulate(point_t delta_time) {
@@ -30,13 +30,13 @@ struct Log {
 	}
 
 	void draw() const {
-		draw_sprite(pos + LOG_DELTA_DRAW_POS, LOG_SIZE, SP_LOG);
+		draw_sprite(pos + LOG_DELTA_DRAW_POS, gobj_state.size, SP_LOG);
 
 		draw_collision_obj(*this);
 	}
 	
 	void simulate_hit(const Player& player) {
-		add_hit_effect(pos + dot(-10, 8) * LOG_SIZE);
+		add_hit_effect(pos + dot(-10, 8) * gobj_state.size);
 
 		dp += player.get_dir() * LOG_DP_SPEED;
 	}

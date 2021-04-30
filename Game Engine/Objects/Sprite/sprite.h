@@ -20,8 +20,8 @@ struct sprite {
 
             picture = matrix<Color>(height, width);
 
-            for (u32 y = 0; y < height; y++) {
-                for (u32 x = 0; x < width; x++) {
+            for (u64 y = 0; y < height; y++) {
+                for (u64 x = 0; x < width; x++) {
 
                     picture[y][x] = Color(
                         img[y * width * 4 + x * 4 + 0],

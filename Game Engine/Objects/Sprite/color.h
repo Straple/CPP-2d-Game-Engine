@@ -67,3 +67,12 @@ bool is_draw(const Color& color) {
 }
 
 #define WHITE Color(0xffffffff)
+#define BLACK Color(0xff000000)
+
+#define RED Color(0xffff0000)
+#define BLUE Color(0xff0000ff)
+#define GREEN Color(0xff00ff00)
+
+#define GREY Color(0xffC4C4C4)
+#define YELLOW Color(0xffffff00)
+#define PURPLE Color(0xffff00ff)

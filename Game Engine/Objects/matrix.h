@@ -14,9 +14,10 @@
 */
 template<typename T>
 class matrix {
-    T* memory;
-    u32 rowLen; // колво строк
     u32 colLen; // колво столбцов
+    u32 rowLen; // колво строк
+    T* memory;
+    
 
     // обнуление
     void zeroing() {

@@ -1,6 +1,4 @@
-﻿#define is_down(b)  (input.buttons[b].is_down)
-#define pressed(b)  (is_down(b) && input.buttons[b].changed)
-#define released(b) (!is_down(b) && input.buttons[b].changed)
+﻿static const dot world_half_size(500, 500);
 
 #include "game_utils.cpp"
 
@@ -22,13 +20,143 @@ std::vector<Fireplace> Fireplaces = {
 	dot(30, -30),
 };
 
-dot world_half_size(500, 500);
+// Players
+// 
+// Slimes
+// Bats
+// 
+// Trees
+// Bushes
+// Logs
+// 
+// Fireplaces
+// Effects
+
+// Для каждого вектора нужно в начале поставить число 32битное = колву элементов
+
+char* get_world_state(u32* len) {
+
+	
+	for (auto& player : Players) {
+		if (player.lvl >= 20) {
+			char* memory = new char[sizeof(player.name) + 1];
+			memory[0] = 't'; // have winner
+
+			for (int i = 0; i < sizeof(player.name); i++) {
+				memory[i + 1] = player.name[i];
+			}
+
+			return memory;
+		}
+	}
+
+
+	*len = sizeof(u32) * 8 + 1;
+	{
+		*len += Players.size() * sizeof(Player);
+		
+		*len += Slimes.size() * sizeof(Slime);
+		*len += Bats.size() * sizeof(Bat);
+
+		*len += Trees.size() * sizeof(Tree);
+		*len += Bushes.size() * sizeof(Bush);
+		*len += Logs.size() * sizeof(Log);
+
+		*len += Effects.size() * sizeof(effect);
+
+		for (auto& fireplace : Fireplaces) {
+			*len += fireplace.get_mem_len();
+		}
+	}
+
+	char* memory = new char[*len];
+
+	memory[0] = 'f'; // no winners
+	char* ptr = memory + 1;
+	
+#define write(Container, type)\
+*reinterpret_cast<u32*>(ptr) = Container.size();\
+ptr += sizeof(u32);\
+for (u32 i = 0; i < Container.size(); i++) {\
+	reinterpret_cast<type*>(ptr)[i] = Container[i];\
+}\
+ptr += sizeof(type) * Container.size();
+	
+	write(Players, Player);
+
+	write(Slimes, Slime);
+	write(Bats, Bat);
+
+	write(Trees, Tree);
+	write(Bushes, Bush);
+	write(Logs, Log);
+
+	write(Effects, effect);
+
+	// Fireplaces
+	{
+		*reinterpret_cast<u32*>(ptr) = Fireplaces.size();
+		ptr += sizeof(u32);
+		for (u32 i = 0; i < Fireplaces.size(); i++) {
+			Fireplaces[i].fill_mem(ptr);
+			ptr += Fireplaces[i].get_mem_len();
+		}
+	}
+
+#undef write
+
+	return memory;
+}
+
+void set_world_state(char* ptr) {
+
+#define read(Container, type)\
+len = *reinterpret_cast<u32*>(ptr);\
+ptr += sizeof(u32);\
+Container.resize(len);\
+for (u32 i = 0; i < len; i++) {\
+	Container[i] = *reinterpret_cast<type*>(ptr);\
+	ptr += sizeof(type);\
+}
+
+	u32 len;
+
+	read(Players, Player);
+
+	read(Slimes, Slime);
+	read(Bats, Bat);
+
+	read(Trees, Tree);
+	read(Bushes, Bush);
+	read(Logs, Log);
+
+	read(Effects, effect);
+
+	// Fireplaces
+	{
+		len = *reinterpret_cast<u32*>(ptr);
+		ptr += sizeof(u32);
+
+		Fireplaces.resize(len);
+		for (u32 i = 0; i < len; i++) {
+			Fireplaces[i] = ptr;
+			ptr += Fireplaces[i].get_mem_len();
+		}
+	}
+
+#undef read
+}
 
 #include "game_collision.cpp"
 
+#define GAME_OBJECT_MAX 200
+#define GAME_OBJECT_MIN 170
+#define GAME_ENEMIES_MAX 40
+#define GAME_ENEMIES_MIN 30
+
 void build_world() {
-	std::uniform_int_distribution<s32> random_size(200, 200);
-	std::uniform_int_distribution<s32> random_size_enemies(20, 20);
+	std::uniform_int_distribution<s32> random_size(GAME_OBJECT_MIN, GAME_OBJECT_MAX);
+	std::uniform_int_distribution<s32> random_size_enemies(GAME_ENEMIES_MIN, GAME_ENEMIES_MAX);
 	std::uniform_int_distribution<s32> random_x(-world_half_size.x, world_half_size.x);
 	std::uniform_int_distribution<s32> random_y(-world_half_size.y, world_half_size.y);
 
@@ -44,99 +172,191 @@ void build_world() {
 		}
 	};
 
-	build(Bushes, random_size(rnd));
-	build(Trees, random_size(rnd));
+	// build bushes and trees
+	{
+		build(Bushes, random_size(rnd));
+		build(Trees, random_size(rnd));
 
-	auto get_coll = [&](auto obj) -> collision_circle {
-		auto res = collision_circle(obj.get_collision());
-		res.circle.radius += 5;
-		return res;
-	};
+		auto get_coll = [&](auto obj) -> collision_circle {
+			auto res = collision_circle(obj.get_collision());
+			res.circle.radius += 5;
+			return res;
+		};
 
-	for (auto& tree1 : Trees) {
-		for (auto& tree2 : Trees) {
-			if (verify_others_obj(tree1, tree2)) {
+		for (auto& tree1 : Trees) {
+			for (auto& tree2 : Trees) {
+				if (verify_others_obj(tree1, tree2)) {
 
-				update_collision(tree1, get_coll(tree2));
+					update_collision(tree1, get_coll(tree2));
+				}
 			}
 		}
-	}
 
-	for (auto& bush1 : Bushes) {
-		for (auto& bush2 : Bushes) {
-			if (verify_others_obj(bush1, bush2)) {
+		for (auto& bush1 : Bushes) {
+			for (auto& bush2 : Bushes) {
+				if (verify_others_obj(bush1, bush2)) {
 
-				update_collision(bush1, get_coll(bush2));
+					update_collision(bush1, get_coll(bush2));
+				}
 			}
 		}
-	}
 
-	for (auto& tree : Trees) {
-		for (auto& bush : Bushes) {
-			if (verify_others_obj(tree, bush)) {
-
-				update_collision(tree, get_coll(bush));
-			}
-		}
-	}
-	for (auto& bush : Bushes) {
 		for (auto& tree : Trees) {
-			if (verify_others_obj(bush, tree)) {
+			for (auto& bush : Bushes) {
+				if (verify_others_obj(tree, bush)) {
 
-				update_collision(bush, get_coll(tree));
+					update_collision(tree, get_coll(bush));
+				}
 			}
 		}
-	}
+		for (auto& bush : Bushes) {
+			for (auto& tree : Trees) {
+				if (verify_others_obj(bush, tree)) {
 
-	for (s32 i = 0; i < Bushes.size(); i++) {
-		for (s32 j = i + 1; j < Bushes.size(); j++) {
-			if (Bushes[i].get_collision().trigger(get_coll(Bushes[j]))) {
-				Bushes.erase(Bushes.begin() + i);
-				i--;
-				break;
+					update_collision(bush, get_coll(tree));
+				}
 			}
 		}
-	}
 
-	for (s32 i = 0; i < Trees.size(); i++) {
-		for (s32 j = i + 1; j < Trees.size(); j++) {
-			if (Trees[i].get_collision().trigger(get_coll(Trees[j]))) {
-				Trees.erase(Trees.begin() + i);
-				i--;
-				break;
+		if (!Fireplaces.empty()) {
+			for (s32 i = 0; i < Bushes.size(); i++) {
+				if (Bushes[i].get_collision().trigger(Fireplaces[0].get_collision())) {
+					Bushes.erase(Bushes.begin() + i);
+					i--;
+				}
+			}
+
+			for (s32 i = 0; i < Trees.size(); i++) {
+				if (Trees[i].get_collision().trigger(Fireplaces[0].get_collision())) {
+					Trees.erase(Trees.begin() + i);
+					i--;
+				}
+			}
+		}
+
+		for (s32 i = 0; i < Bushes.size(); i++) {
+			for (s32 j = i + 1; j < Bushes.size(); j++) {
+				if (Bushes[i].get_collision().trigger(get_coll(Bushes[j]))) {
+					Bushes.erase(Bushes.begin() + i);
+					i--;
+					break;
+				}
+			}
+		}
+
+		for (s32 i = 0; i < Trees.size(); i++) {
+			for (s32 j = i + 1; j < Trees.size(); j++) {
+				if (Trees[i].get_collision().trigger(get_coll(Trees[j]))) {
+					Trees.erase(Trees.begin() + i);
+					i--;
+					break;
+				}
 			}
 		}
 	}
 
 	build(Slimes, random_size_enemies(rnd));
 	build(Bats, random_size_enemies(rnd));
-
-
 }
 
 // UI objects
 
 Mouse mouse(SP_CURSOR, SP_FOCUS_CURSOR, 0.09);
 
-collision_box box(dot(-20, -30), dot(10, -40));
 
-button btn("click", dot(), 1, 0xffffffff, 0xffff0000, false);
+int find_player_ind(u8 player_id) {
+	int i;
+	for (i = 0; i < Players.size() && Players[i].id != player_id; i++) {}
+	return i;
+}
 
+void simulate_player(const Input& input, point_t delta_time, u8 player_id) {
 
-void simulate_physics(const Input& input, point_t delta_time) {
+	player_id = find_player_ind(player_id);
 
-	// simulate player
+	// накопление вектора движения
+	auto accum_ddp = [&input](button_t left, button_t right, button_t top, button_t bottom) -> dot {
+		return dot(is_down(right) - is_down(left), is_down(top) - is_down(bottom));
+	};
+
+	Players[player_id].simulate(delta_time, accum_ddp(BUTTON_A, BUTTON_D, BUTTON_W, BUTTON_S), is_down(BUTTON_J), pressed(BUTTON_SPACE));
+
+	// player attack
 	{
-		// накопление вектора движения
-		auto accum_ddp = [&input](button_t left, button_t right, button_t top, button_t bottom) -> dot {
-			return dot(is_down(right) - is_down(left), is_down(top) - is_down(bottom));
+		if (Players[player_id].simulate_attack(Logs) |
+			Players[player_id].simulate_attack(Slimes) |
+			Players[player_id].simulate_attack(Bats) |
+			Players[player_id].simulate_attack(Trees) |
+			Players[player_id].simulate_attack(Players)) {
+
+			Players[player_id].now_is_attached = false;
+		}
+	}
+}
+
+void simulate_physics(point_t delta_time) {
+
+	// add new world objects
+	{
+		std::uniform_int_distribution<s32> random_x(-world_half_size.x, world_half_size.x);
+		std::uniform_int_distribution<s32> random_y(-world_half_size.y, world_half_size.y);
+		std::uniform_int_distribution<s32> range(1, 3);
+
+		auto random_dot = [&]() -> dot {
+			return dot(random_x(rnd), random_y(rnd));
 		};
 
-		Players[0].simulate(delta_time, accum_ddp(BUTTON_A, BUTTON_D, BUTTON_W, BUTTON_S), is_down(BUTTON_J));
+		
+		if (Slimes.size() < GAME_ENEMIES_MIN) {
+			int cnt = range(rnd);
 
-		//Players[1].simulate(delta_time, accum_ddp(BUTTON_LEFT, BUTTON_RIGHT, BUTTON_UP, BUTTON_DOWN), is_down(BUTTON_K));
+			while (cnt--) {
+				Slimes.push_back(random_dot());
+				//std::cout << "new slime: " << Slimes.back().pos << "\n";
+			}
+		}
 
-		simulate_game_collision(Players);
+		if (Bats.size() < GAME_ENEMIES_MIN) {
+			int cnt = range(rnd);
+
+			while (cnt--) {
+				Bats.push_back(random_dot());
+				//std::cout << "new bat: " << Bats.back().pos << "\n";
+			}
+		}
+
+		if (Trees.size() < GAME_OBJECT_MIN) {
+			int cnt = range(rnd);
+
+			while (cnt--) {
+				Trees.push_back(random_dot());
+				//std::cout << "new tree: " << Trees.back().pos << "\n";
+			}
+
+			auto get_coll = [&](auto obj) -> collision_circle {
+				auto res = collision_circle(obj.get_collision());
+				res.circle.radius += 5;
+				return res;
+			};
+
+			for (auto& tree1 : Trees) {
+				for (auto& tree2 : Trees) {
+					if (verify_others_obj(tree1, tree2)) {
+
+						update_collision(tree1, get_coll(tree2));
+					}
+				}
+			}
+
+			for (auto& tree : Trees) {
+				for (auto& bush : Bushes) {
+					if (verify_others_obj(tree, bush)) {
+
+						update_collision(tree, get_coll(bush));
+					}
+				}
+			}
+		}
 	}
 
 	// simulate logs
@@ -170,10 +390,6 @@ void simulate_physics(const Input& input, point_t delta_time) {
 		for (auto& fireplace : Fireplaces) {
 			fireplace.simulate(delta_time);
 		}
-
-		if (Fireplaces[0].time <= 0) {
-			// game over
-		}
 	}
 
 	// simulate effects
@@ -185,42 +401,11 @@ void simulate_physics(const Input& input, point_t delta_time) {
 			}
 		}
 	}
-
-	rain.simulate(delta_time);
-
-	camera.simulate(Players[0].pos, delta_time);
-
-	mouse.simulate(input);
-
-	//btn.simulate(&mouse);
 }
 
-void simulate_logics(const Input& input) {
-	if (pressed(BUTTON_ESC)) {
-		running = false;
-	}
+void render_game(u8 player_id) {
 
-	/*if (pressed(BUTTON_ENTER)) {
-		fullscreen_mod_is_changed = true;
-	}*/
-
-	if (pressed(BUTTON_ENTER)) {
-		debug_mode = !debug_mode;
-	}
-
-	if (pressed(BUTTON_K)) {
-		show_locator = !show_locator;
-	}
-}
-
-void render_game(const Input& input) {
 	clear_screen(0xff000000);
-
-	{
-		dot p;
-		static_pos_update(p, !camera_mod);
-		draw_rect(p, world_half_size, 0xff4d4d4d);
-	}
 
 	draw_texture(dot(-world_half_size.x, world_half_size.y), 32, 32, 0.5, SP_GRASS_BACKGROUND);
 
@@ -304,10 +489,9 @@ void render_game(const Input& input) {
 				case TO_FIREPLACE: {
 					return reinterpret_cast<const Fireplace*>(ptr)->pos.y;
 				}break;
-				case TO_UNDEFIND: {
-					ASSERT(false, "undefind object type");
-				}break;
 				}
+
+				ASSERT(false, "undefind object type");
 			}
 
 			void draw() {
@@ -373,7 +557,7 @@ void render_game(const Input& input) {
 			obj.draw();
 		}
 	}
-
+	
 	// draw effects
 	{
 		for (u32 i = 0; i < Effects.size(); i++) {
@@ -381,59 +565,50 @@ void render_game(const Input& input) {
 		}
 	}
 
-	rain.draw();
-	
-	// draw collision box
-	/*{
-		dot pos0(box.p0.x, box.p1.y);
-		static_pos_update(pos0, !camera_mod);
 
-		dot pos1(box.p1.x, box.p0.y);
-		static_pos_update(pos1, !camera_mod);
-
-		draw_rect2(pos0, pos1, 0x30ffffff);
-	}*/
+	player_id = find_player_ind(player_id);
 	
+	// hp
+	ui_state(dot(5 - arena_half_size.x, arena_half_size.y - 5), dot(25 - arena_half_size.x, arena_half_size.y - 7.5))
+		.draw(Players[player_id].hp, Players[player_id].max_hp, GREY, RED);
+
+	// exp
+	ui_state(dot(5 - arena_half_size.x, arena_half_size.y - 10), dot(25 - arena_half_size.x, arena_half_size.y - 12.5))
+		.draw(Players[player_id].exp, s16(10), GREY, YELLOW);
+
+	// damage
+	draw_object(Players[player_id].damage, dot(5 - arena_half_size.x, arena_half_size.y - 15), 0.6, BLUE);
+
+	draw_object(Players[player_id].lvl, dot(5 - arena_half_size.x, arena_half_size.y - 20), 0.6, PURPLE);
+
+
 	mouse.draw();
-
-	// draw button and button count
-	/*{
-		static u32 cnt = 0;
-		if (btn.coll.trigger(mouse.pos) && pressed(BUTTON_MOUSE_L)) {
-			cnt++;
-		}
-
-		btn.draw();
-
-		draw_object(cnt, dot(20, 20), 1, 0xffffffff);
-	}*/
-
-
-	if (is_down(BUTTON_MOUSE_L)) {
-		draw_circle(Circle(mouse.pos, 40), Color(0xff00ff, 100));
-	}
-
-	if (is_down(BUTTON_MOUSE_R)) {
-		draw_circle(Circle(mouse.pos, 5), Color(0x00ff00, 100));
-	}
-
-	/*draw_text_align("\
-+---------------+\n\
-|1234567890+-!?.|\n\
-+---------------+\n\
-", dot(0, 0), 0.6, 0xffffffffff);
-	draw_text_align("\
-+--------------------------+\n\
-|ABCDEFGHIJKLMNOPQRSTUVWXYZ|\n\
-|abcdefghijklmnopqrstuvwxyz|\n\
-+--------------------------+\n\
-", dot(0, -20), 0.6, 0xffffffffff);*/
 }
 
-void simulate_game(const Input& input, point_t delta_time) {
+template<typename func_t>
+void simulate_input(const Input& input, func_t&& window_mode_callback) {
+	if (pressed(BUTTON_ESC)) {
+		eng_state.flip(RUN_SETUP);
+	}
+
+	if (pressed(BUTTON_ENTER)) {
+		window_mode_callback();
+	}
+
+	/*if (pressed(BUTTON_TAB)) {
+		eng_state.flip(DEBUG);
+	}
+
+	if (pressed(BUTTON_K)) {
+		eng_state.flip(LOCATOR_VIS);
+	}*/
+
+	if (pressed(BUTTON_F)) {
+		eng_state.flip(FPS_VIS);
+	}
 
 	// update render_scale
-	{
+	/*{
 		if (is_down(BUTTON_UP)) {
 
 			point_t pt_x = (mouse.pos.x + arena_half_size.x) * scale_factor;
@@ -470,26 +645,42 @@ void simulate_game(const Input& input, point_t delta_time) {
 			mouse.pos = dot(pt_x, pt_y)
 				/ scale_factor - arena_half_size;
 		}
-	}
+	}*/
 
-	simulate_physics(input, delta_time);
-
-	simulate_logics(input);
-
-	render_game(input);
-
-	draw_object(Players[0].exp, dot(5 - arena_half_size.x, -5 + arena_half_size.y), 0.6, Color(0xfffff000));
-
-	draw_object(Players[0].hp, dot(5 - arena_half_size.x, -10 + arena_half_size.y), 0.6, Color(0xffff0000));
-
-	// player attack
-	{
-		if (Players[0].simulate_attack(Logs) | Players[0].simulate_attack(Slimes) | Players[0].simulate_attack(Bats) | Players[0].simulate_attack(Trees)) {
-			Players[0].now_is_attached = false;
-		}
-	}
+	mouse.simulate(input);
 }
 
-#undef is_down
-#undef pressed
-#undef released
+template<typename func_t>
+void simulate_game(const Input& input, point_t delta_time, func_t&& window_mode_callback) {
+
+	simulate_input(input, window_mode_callback);
+
+	camera.simulate(Players[0].pos, delta_time);
+
+	// simulate players
+	{
+		simulate_player(input, delta_time, 0);
+		//simulate_player(input, delta_time, 1);
+		//...
+
+		simulate_game_collision(Players);
+	}
+
+	simulate_physics(delta_time);
+
+	mouse.simulate(input);
+
+	render_game(0);
+
+	/*draw_text_align("\
++---------------+\n\
+|1234567890+-!?.|\n\
++---------------+\n\
+", dot(0, 0), 0.6, 0xffffffffff);
+	draw_text_align("\
++--------------------------+\n\
+|ABCDEFGHIJKLMNOPQRSTUVWXYZ|\n\
+|abcdefghijklmnopqrstuvwxyz|\n\
++--------------------------+\n\
+", dot(0, -20), 0.6, 0xffffffffff);*/
+}

@@ -44,7 +44,7 @@ void move_to2d(dot& p, const dot& p_to, dot& dp, dot ddp, point_t dt) {
     move_to(p.y, p_to.y, dp.y, ddp.y, dt);
 }
 
-enum class direction_t {
+enum class direction_t : u8 {
 
     // DON'T SHUFFLE THIS CODE
 
@@ -78,5 +78,7 @@ dot get_direction(direction_t dir) {
             return dot(0, -1);
         }
     }
+
+    ASSERT(false, "undefind direction type");
 }
 

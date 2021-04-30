@@ -13,11 +13,7 @@ struct effect {
 
 	// вернет правду, если его анимация закончилась и нужно удалить объект
 	bool simulate(point_t delta_time) {
-		u32 cur_frame = anim.frame_count;
-
-		anim.frame_update(delta_time);
-
-		return anim.frame_count < cur_frame;
+		return anim.frame_update(delta_time);
 	}
 
 	void draw() {

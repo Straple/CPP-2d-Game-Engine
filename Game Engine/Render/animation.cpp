@@ -1,6 +1,7 @@
 ﻿
 
 struct animation {
+	
 	sprite_t sprite_sheet; // лист спрайтов
 
 	u8 frame_begin; // начало кадра в листе спрайтов
@@ -28,15 +29,18 @@ struct animation {
 		frame_time_accum = 0;
 	}
 
-	void frame_update(point_t delta_time) {
+	// вернет true, если прошел полный веток анимации
+	bool frame_update(point_t delta_time) {
 		frame_time_accum += delta_time;
 		if (frame_time_accum > frame_duration) {
 			frame_time_accum = 0;
 			frame_count++;
 			if (frame_count >= frame_size) {
 				frame_count = 0;
+				return true;
 			}
 		}
+		return false;
 	}
 
 	template<typename func_t = Color(const Color& color)>

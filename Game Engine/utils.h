@@ -29,7 +29,7 @@ using u32 = uint32_t;
 using s64 = int64_t;
 using u64 = uint64_t;
 
-using point_t = double;
+using point_t = float;
 
 using text_t = const char*;
 
@@ -89,9 +89,13 @@ u64 round_two(u64 n) {
 
 void fill(u32* dest, u32 val32, u32 len) {
 	u64 val64 = (static_cast<u64>(val32) << 32) | val32;
-	for (u32 i = 0; i + 1 < len; i += 2) {
+
+	len--;
+	for (u32 i = 0; i < len; i += 2) {
 		*reinterpret_cast<u64*>(dest + i) = val64;
 	}
+	len++;
+
 	if (len & 1) {
 		dest[len - 1] = val32;
 	}

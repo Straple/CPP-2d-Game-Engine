@@ -5,7 +5,7 @@
 *       +------+           +------+
 */
 
-enum sprite_t {
+enum sprite_t : u8 {
 
 	// world
 
@@ -53,7 +53,14 @@ sprite Sprites[sprite_t::SP_COUNT];
 
 void read_sprites() {
 
-#define read(type, name) Sprites[type] = sprite(std::string("Sprites/") + name)
+	std::cout << std::fixed << std::setprecision(4);
+
+#define read(type, name)\
+{\
+	/*Timer time;*/\
+	Sprites[type] = sprite(std::string("Sprites/") + name);\
+	/*std::cout << "read sprite: " << time << " " << #type << "\n";*/\
+}
 
 	// world
 	{
