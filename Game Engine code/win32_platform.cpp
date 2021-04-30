@@ -123,7 +123,7 @@ UP, DOWN = render_scale
 
 #include "Objects/objects.h"
 
-Engine_state eng_state(RUN_SETUP | CONSOLE_VIS | FULLSCREEN | FPS_VIS | CAMERA);
+Engine_state eng_state(RUN_SETUP | CONSOLE_VIS | FULLSCREEN | CAMERA);
 
 #include "Sprites/sprite.cpp"
 

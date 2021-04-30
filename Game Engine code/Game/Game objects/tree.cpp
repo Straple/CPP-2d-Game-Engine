@@ -1,4 +1,4 @@
-
+﻿
 #define TREE_DELTA_DRAW_POS dot(-16, 36) * gobj_state.size
 
 struct Tree {

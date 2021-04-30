@@ -1,4 +1,4 @@
-// visibility
+п»ї// visibility
 #define PLAYER_DELTA_DRAW_POS dot(-30.5, 41) * gobj_state.size
 
 // physics
@@ -33,7 +33,7 @@ const static animation player_anims[] = {
 		animation(SP_PLAYER, 18, 1, 0.1, 64), // idle down
 };
 
-// дерево анимаций игрока
+// РґРµСЂРµРІРѕ Р°РЅРёРјР°С†РёР№ РёРіСЂРѕРєР°
 struct Player_anim_tree {
 
 	enum anim_t: u8 {
@@ -55,9 +55,9 @@ struct Player_anim_tree {
 		}
 	};
 
-	// возвращает анимацию
+	// РІРѕР·РІСЂР°С‰Р°РµС‚ Р°РЅРёРјР°С†РёСЋ
 	static anim_and_dir_t get_anim(dot dir, anim_and_dir_t type) {
-		// дефолтная анимация
+		// РґРµС„РѕР»С‚РЅР°СЏ Р°РЅРёРјР°С†РёСЏ
 		if (type.anim == NONE) {
 			return { IDLE, direction_t::RIGHT };
 		}
@@ -97,7 +97,7 @@ struct Player {
 	s16 damage = 70;
 	s16 exp = 0;
 
-	// каждый уровень:
+	// РєР°Р¶РґС‹Р№ СѓСЂРѕРІРµРЅСЊ:
 	// max_hp += 30
 	// damage += 2
 	// exp -= 50
@@ -149,14 +149,14 @@ struct Player {
 		}
 
 		if (is_paralyzed) {
-			// игрок не может двигаться
+			// РёРіСЂРѕРє РЅРµ РјРѕР¶РµС‚ РґРІРёРіР°С‚СЊСЃСЏ
 			anim_type.anim = Player_anim_tree::IDLE;
 			anim = player_anims[anim_type.get_num()];
 			is_attack = now_is_attached = false;
 		} 
 		else if (is_jumped) {
 
-			// на 50% быстрее бега
+			// РЅР° 50% Р±С‹СЃС‚СЂРµРµ Р±РµРіР°
 			dot dp_tmp = dp;
 			simulate_move2d(pos, dp_tmp, dot(), delta_time);
 
@@ -199,11 +199,11 @@ struct Player {
 			time_between_attack += delta_time;
 			paralyzed_cooldown_acc += delta_time;
 			
-			// ddp - вектор направления игрока
+			// ddp - РІРµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ РёРіСЂРѕРєР°
 
-			// нужно понять какую анимацию воспроизводить
+			// РЅСѓР¶РЅРѕ РїРѕРЅСЏС‚СЊ РєР°РєСѓСЋ Р°РЅРёРјР°С†РёСЋ РІРѕСЃРїСЂРѕРёР·РІРѕРґРёС‚СЊ
 
-			// игрок начал атаковать
+			// РёРіСЂРѕРє РЅР°С‡Р°Р» Р°С‚Р°РєРѕРІР°С‚СЊ
 			if (is_attached && !is_attack) {
 
 				bool new_attack = false;
@@ -230,7 +230,7 @@ struct Player {
 
 			if (is_attack) {
 
-				// удар закончился
+				// СѓРґР°СЂ Р·Р°РєРѕРЅС‡РёР»СЃСЏ
 				if (anim.frame_update(delta_time)) {
 					now_is_attached = is_attack = false;
 					anim_type.anim = Player_anim_tree::IDLE;
@@ -247,17 +247,17 @@ struct Player {
 					simulate_move2d(pos, dp, ddp, delta_time);
 				}
 
-				// текущая анимация+
+				// С‚РµРєСѓС‰Р°СЏ Р°РЅРёРјР°С†РёСЏ+
 				auto current_anim = Player_anim_tree::get_anim(ddp.normalize(), anim_type);
 
-				if (anim_type.get_num() != current_anim.get_num()) { // у нас сменились анимации
+				if (anim_type.get_num() != current_anim.get_num()) { // Сѓ РЅР°СЃ СЃРјРµРЅРёР»РёСЃСЊ Р°РЅРёРјР°С†РёРё
 					is_attack = false;
 
 					anim_type = current_anim;
 
 					anim = player_anims[current_anim.get_num()];
 
-					// начинаем с 1 кадра, чтобы мы сразу начинали движение
+					// РЅР°С‡РёРЅР°РµРј СЃ 1 РєР°РґСЂР°, С‡С‚РѕР±С‹ РјС‹ СЃСЂР°Р·Сѓ РЅР°С‡РёРЅР°Р»Рё РґРІРёР¶РµРЅРёРµ
 					anim.frame_count = std::min<u32>(1, anim.frame_size - 1);
 				}
 
@@ -266,7 +266,7 @@ struct Player {
 		}
 	}
 
-	// возвращает направление анимации игрока
+	// РІРѕР·РІСЂР°С‰Р°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ Р°РЅРёРјР°С†РёРё РёРіСЂРѕРєР°
 	dot get_dir() const {
 		return get_direction(anim_type.dir);
 	}
@@ -303,7 +303,7 @@ struct Player {
 			get_attack_collision().trigger(p); // collision checked
 	}
 
-	// вернет правду, если атака кого-то зацепила
+	// РІРµСЂРЅРµС‚ РїСЂР°РІРґСѓ, РµСЃР»Рё Р°С‚Р°РєР° РєРѕРіРѕ-С‚Рѕ Р·Р°С†РµРїРёР»Р°
 	template<typename container_t>
 	bool simulate_attack(container_t& Enemies) {
 

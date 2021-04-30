@@ -1,4 +1,4 @@
-
+п»ї
 
 template<typename T1, typename T2>
 bool verify_others_obj(const T1& Lhs, const T2& Rhs) {
@@ -34,7 +34,7 @@ void update_collision(Tree& tree, const collision& coll) {
 	tree.pos = coll.bubble(tree.get_collision());
 }
 
-// массив объектов с коллизией выталкивет другие объекты
+// РјР°СЃСЃРёРІ РѕР±СЉРµРєС‚РѕРІ СЃ РєРѕР»Р»РёР·РёРµР№ РІС‹С‚Р°Р»РєРёРІРµС‚ РґСЂСѓРіРёРµ РѕР±СЉРµРєС‚С‹
 template<typename container_t>
 void simulate_game_collision(container_t& Objects) {
 
@@ -49,7 +49,7 @@ void simulate_game_collision(container_t& Objects) {
 
 	if (typeid(Objects.back()) == typeid(Bat)) {
 
-		// bat2 толкает bat1
+		// bat2 С‚РѕР»РєР°РµС‚ bat1
 		for (auto& bat1 : Bats) {
 			for (auto& bat2 : Bats) {
 				if (verify_others_obj(bat1, bat2)) {

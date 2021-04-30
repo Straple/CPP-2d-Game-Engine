@@ -1,4 +1,4 @@
-// visibility
+п»ї// visibility
 #define SLIME_ALPHA 210
 #define SLIME_DELTA_DRAW_POS dot(-30, 38) * gobj_state.size
 #define SLIME_FRAME_DURATION 1.0 / 7
@@ -30,7 +30,7 @@ struct Slime {
 
 	// settings
 	s16 hp = gobj_state.hp;
-	s16 target = -1; // цели преследования нет
+	s16 target = -1; // С†РµР»Рё РїСЂРµСЃР»РµРґРѕРІР°РЅРёСЏ РЅРµС‚
 
 	animation anim = SLIME_ANIM_IDLE;
 
@@ -62,25 +62,25 @@ struct Slime {
 
 				Player& player = Players[target];
 
-				// анимация атаки закончилась
+				// Р°РЅРёРјР°С†РёСЏ Р°С‚Р°РєРё Р·Р°РєРѕРЅС‡РёР»Р°СЃСЊ
 				if (anim.frame_update(delta_time)) {
 					// idle animation beginner
 
-					player.is_paralyzed = is_attack = false; // позиция игрока не статична и не анимация атаки
+					player.is_paralyzed = is_attack = false; // РїРѕР·РёС†РёСЏ РёРіСЂРѕРєР° РЅРµ СЃС‚Р°С‚РёС‡РЅР° Рё РЅРµ Р°РЅРёРјР°С†РёСЏ Р°С‚Р°РєРё
 
 					attack_cooldown_accum = 0; // cooldown reset
 
 					anim = SLIME_ANIM_IDLE;
 				}
 
-				// шарик лопнул
+				// С€Р°СЂРёРє Р»РѕРїРЅСѓР»
 				if (anim.frame_count > 25 && player.is_paralyzed) {
 
 					// push player
 					player.dp = Circle(dot(), SLIME_PUSH_DP).get_random_dot();
 
-					player.is_paralyzed = false; // у игрока не статическая позиция
-					player.paralyzed_cooldown_acc = 0; // перезарядка
+					player.is_paralyzed = false; // Сѓ РёРіСЂРѕРєР° РЅРµ СЃС‚Р°С‚РёС‡РµСЃРєР°СЏ РїРѕР·РёС†РёСЏ
+					player.paralyzed_cooldown_acc = 0; // РїРµСЂРµР·Р°СЂСЏРґРєР°
 
 					player.hp -= enemy_state.damage;
 
@@ -97,17 +97,17 @@ struct Slime {
 						(Players[target].pos - pos).getLen() > radius;
 				};
 
-				// цель потеряна
+				// С†РµР»СЊ РїРѕС‚РµСЂСЏРЅР°
 				if (target != -1 && bad_target(target, enemy_state.persec_radius)) {
 					target = -1;
 					walk_accum = enemy_state.walk_time;
 				}
 
-				if (target == -1) { // цели нет
+				if (target == -1) { // С†РµР»Рё РЅРµС‚
 
-					// поищем
+					// РїРѕРёС‰РµРј
 
-					// найдем самого близжайшего подходящего игрока
+					// РЅР°Р№РґРµРј СЃР°РјРѕРіРѕ Р±Р»РёР·Р¶Р°Р№С€РµРіРѕ РїРѕРґС…РѕРґСЏС‰РµРіРѕ РёРіСЂРѕРєР°
 					for(s32 i = 0; i < Players.size(); i++) {
 
 						if(!bad_target(i, target != -1 ? (Players[target].pos - pos).getLen() : enemy_state.locator_radius)){
@@ -122,23 +122,23 @@ struct Slime {
 
 					move_to2d(pos, player.pos, dp, (player.pos - pos).normalize() * enemy_state.ddp_speed, delta_time);
 
-					// игрока никто не ест и мы близко к игроку и
+					// РёРіСЂРѕРєР° РЅРёРєС‚Рѕ РЅРµ РµСЃС‚ Рё РјС‹ Р±Р»РёР·РєРѕ Рє РёРіСЂРѕРєСѓ Рё
 					if (!player.is_paralyzed && (player.pos - pos).getLen() <= enemy_state.jump_radius &&
 
-						// и перезарядка атаки прошла и перезарядка игрока тоже
+						// Рё РїРµСЂРµР·Р°СЂСЏРґРєР° Р°С‚Р°РєРё РїСЂРѕС€Р»Р° Рё РїРµСЂРµР·Р°СЂСЏРґРєР° РёРіСЂРѕРєР° С‚РѕР¶Рµ
 						attack_cooldown_accum >= enemy_state.attack_cooldown && player.paralyzed_cooldown_acc >= PLAYER_STATICPOS_COOLDOWN) {
 
 						// attack animation beginner
 
-						player.is_paralyzed = is_attack = true; // игрок не может двигаться и у нас анимация атаки
+						player.is_paralyzed = is_attack = true; // РёРіСЂРѕРє РЅРµ РјРѕР¶РµС‚ РґРІРёРіР°С‚СЊСЃСЏ Рё Сѓ РЅР°СЃ Р°РЅРёРјР°С†РёСЏ Р°С‚Р°РєРё
 
-						pos = player.pos; // прыгаем на игрока
+						pos = player.pos; // РїСЂС‹РіР°РµРј РЅР° РёРіСЂРѕРєР°
 
 						anim = SLIME_ANIM_ATTACK;
 					}
 				}
 				else {
-					// цели нет. Можем погулять
+					// С†РµР»Рё РЅРµС‚. РњРѕР¶РµРј РїРѕРіСѓР»СЏС‚СЊ
 
 					walk_accum += delta_time;
 

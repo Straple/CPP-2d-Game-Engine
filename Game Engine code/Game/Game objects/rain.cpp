@@ -1,4 +1,4 @@
-
+﻿
 //struct Rain {
 //
 //	point_t time_before_start_rain;

@@ -1,4 +1,4 @@
-
+п»ї
 #define FIREPLACE_SIZE 0.4
 
 #define FIREPLACE_DELTA_DRAW_POS dot(-42, 10) * FIREPLACE_SIZE
@@ -97,7 +97,7 @@ memory += sizeof(type);
 		return res;
 	}
 
-	// заполняет указатель данной структурой
+	// Р·Р°РїРѕР»РЅСЏРµС‚ СѓРєР°Р·Р°С‚РµР»СЊ РґР°РЅРЅРѕР№ СЃС‚СЂСѓРєС‚СѓСЂРѕР№
 	void fill_mem(char* memory) {
 
 #define write(obj, type)\

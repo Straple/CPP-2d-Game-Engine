@@ -1,4 +1,4 @@
-// visibility
+﻿// visibility
 #define BUSH_SIZE 0.5
 
 // fixeds

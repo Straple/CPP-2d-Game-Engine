@@ -1,4 +1,4 @@
-// visibility
+п»ї// visibility
 #define BAT_DELTA_DRAW_POS dot(-8, 26) * gobj_state.size
 #define BAT_FRAME_DURATION 1.0 / 7
 
@@ -22,7 +22,7 @@ struct Bat {
 
 	// settings
 	s16 hp = gobj_state.hp;
-	s16 target = -1; // цели преследования нет
+	s16 target = -1; // С†РµР»Рё РїСЂРµСЃР»РµРґРѕРІР°РЅРёСЏ РЅРµС‚
 
 	// animation
 	animation anim = animation(SP_BAT, 0, 5, BAT_FRAME_DURATION, 16);
@@ -59,18 +59,18 @@ struct Bat {
 				anim.sprite_sheet = SP_BAT;
 			}
 			
-			// цель потеряна
+			// С†РµР»СЊ РїРѕС‚РµСЂСЏРЅР°
 			if (target != -1 && (Players[target].pos - pos).getLen() > enemy_state.persec_radius) {
 				target = -1;
 				walk_to = pos;
 				walk_accum = enemy_state.walk_time;
 			}
 
-			if (target == -1) { // цели нет
+			if (target == -1) { // С†РµР»Рё РЅРµС‚
 
-				// поищем
+				// РїРѕРёС‰РµРј
 
-				// найдем самого близжайшего игрока
+				// РЅР°Р№РґРµРј СЃР°РјРѕРіРѕ Р±Р»РёР·Р¶Р°Р№С€РµРіРѕ РёРіСЂРѕРєР°
 				for (s32 i = 0; i < Players.size(); i++) {
 
 					if (target == -1 || (Players[target].pos - pos).getLen() > (Players[i].pos - pos).getLen()) {
@@ -78,7 +78,7 @@ struct Bat {
 					}
 				}
 
-				// не подходит. Слишком далеко
+				// РЅРµ РїРѕРґС…РѕРґРёС‚. РЎР»РёС€РєРѕРј РґР°Р»РµРєРѕ
 				if (target != -1 && (Players[target].pos - pos).getLen() > enemy_state.locator_radius) {
 					target = -1;
 				}
@@ -90,7 +90,7 @@ struct Bat {
 
 				move_to2d(pos, player.pos, dp, (player.pos - pos).normalize() * enemy_state.ddp_speed, delta_time);
 
-				// мы близко к игроку и
+				// РјС‹ Р±Р»РёР·РєРѕ Рє РёРіСЂРѕРєСѓ Рё
 				if ((player.pos - pos).getLen() <= enemy_state.jump_radius &&
 					attack_cooldown_accum >= enemy_state.attack_cooldown) {
 
@@ -98,14 +98,14 @@ struct Bat {
 
 					attack_cooldown_accum = 0;
 
-					pos = player.pos; // прыгаем на игрока
+					pos = player.pos; // РїСЂС‹РіР°РµРј РЅР° РёРіСЂРѕРєР°
 
 					player.hp -= enemy_state.damage;
 					add_hit_effect(player.pos + dot(-8, 16) * player.gobj_state.size);
 				}
 			}
 			else {
-				// цели нет. Можем погулять
+				// С†РµР»Рё РЅРµС‚. РњРѕР¶РµРј РїРѕРіСѓР»СЏС‚СЊ
 
 				walk_accum += delta_time;
 
@@ -158,7 +158,7 @@ struct Bat {
 		}
 	}
 
-	// вернет правду, если враг уничтожен
+	// РІРµСЂРЅРµС‚ РїСЂР°РІРґСѓ, РµСЃР»Рё РІСЂР°Рі СѓРЅРёС‡С‚РѕР¶РµРЅ
 	void simulate_hit(const Player& player) {
 		add_hit_effect(pos + BAT_DELTA_DRAW_POS);
 

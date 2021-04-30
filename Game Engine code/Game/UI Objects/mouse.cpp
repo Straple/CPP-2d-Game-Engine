@@ -1,4 +1,4 @@
-
+п»ї
 struct Mouse {
 
 	sprite_t sprite;
@@ -7,7 +7,7 @@ struct Mouse {
 	point_t size;
 
 	dot pos;
-	dot focus_pos; // позиция точки, когда мы нажали на мышку и удерживали
+	dot focus_pos; // РїРѕР·РёС†РёСЏ С‚РѕС‡РєРё, РєРѕРіРґР° РјС‹ РЅР°Р¶Р°Р»Рё РЅР° РјС‹С€РєСѓ Рё СѓРґРµСЂР¶РёРІР°Р»Рё
 
 	bool focus = false;
 	bool is_down = false;

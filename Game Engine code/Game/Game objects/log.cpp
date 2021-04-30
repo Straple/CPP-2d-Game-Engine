@@ -1,4 +1,4 @@
-
+﻿
 #define LOG_DELTA_DRAW_POS dot(-30, 18) * gobj_state.size
 
 #define LOG_DP_SPEED 200

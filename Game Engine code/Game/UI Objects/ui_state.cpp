@@ -1,4 +1,4 @@
-
+﻿
 struct ui_state {
 	
 	dot top_left, bottom_right;

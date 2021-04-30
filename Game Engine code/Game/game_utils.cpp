@@ -1,4 +1,4 @@
-
+﻿
 void draw_collision(const collision_circle& coll) {
 	if (eng_state.debug_mode()) {
 		Circle circle = coll.circle;

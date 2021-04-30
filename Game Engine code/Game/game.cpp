@@ -595,20 +595,20 @@ void simulate_input(const Input& input, func_t&& window_mode_callback) {
 		window_mode_callback();
 	}
 
-	/*if (pressed(BUTTON_TAB)) {
+	if (pressed(BUTTON_TAB)) {
 		eng_state.flip(DEBUG);
 	}
 
 	if (pressed(BUTTON_K)) {
 		eng_state.flip(LOCATOR_VIS);
-	}*/
+	}
 
 	if (pressed(BUTTON_F)) {
 		eng_state.flip(FPS_VIS);
 	}
 
 	// update render_scale
-	/*{
+	{
 		if (is_down(BUTTON_UP)) {
 
 			point_t pt_x = (mouse.pos.x + arena_half_size.x) * scale_factor;
@@ -645,7 +645,7 @@ void simulate_input(const Input& input, func_t&& window_mode_callback) {
 			mouse.pos = dot(pt_x, pt_y)
 				/ scale_factor - arena_half_size;
 		}
-	}*/
+	}
 
 	mouse.simulate(input);
 }

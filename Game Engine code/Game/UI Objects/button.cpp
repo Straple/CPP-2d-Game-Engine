@@ -1,7 +1,7 @@
-// òåêñò ñ êîëèçèåé
-struct button { // êíîïêà
+ï»¿// Ñ‚ÐµÐºÑÑ‚ Ñ ÐºÐ¾Ð»Ð¸Ð·Ð¸ÐµÐ¹
+struct button { // ÐºÐ½Ð¾Ð¿ÐºÐ°
 	text_t text;
-	dot pos; // öåíòð òåêñòà ïî x
+	dot pos; // Ñ†ÐµÐ½Ñ‚Ñ€ Ñ‚ÐµÐºÑÑ‚Ð° Ð¿Ð¾ x
 	point_t size;
 	collision_box coll;
 	Color color, // usual color
@@ -20,7 +20,7 @@ struct button { // êíîïêà
 		color = _color;
 		focus_color = _focus_color;
 
-		// !ñîçäàòü êîëëèçèþ!
+		// !ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ ÐºÐ¾Ð»Ð»Ð¸Ð·Ð¸ÑŽ!
 		{
 			int len = text_len(_text);
 
@@ -44,7 +44,7 @@ struct button { // êíîïêà
 		}
 	}
 
-	// îáíîâèò ñîñòîÿíèå ôîêóñà ìûøè
+	// Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ðµ Ñ„Ð¾ÐºÑƒÑÐ° Ð¼Ñ‹ÑˆÐ¸
 	void simulate(Mouse* mouse) {
 		if (coll.trigger(mouse->pos)) {
 			mouse->focus = true;
