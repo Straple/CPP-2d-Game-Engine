@@ -11,6 +11,8 @@ struct Log {
 
 	inline static const s16 hp = 1;
 
+	serialization_traits_byte(Log);
+
 	dot pos;
 	dot dp;
 

@@ -136,6 +136,8 @@ dot arena_half_size;
 int simulate_client(const char* ip);
 int simulate_server();
 
+#include "Serialize/serialize.h"
+
 #include "Render/render.cpp"
 
 #include "Game/game.cpp"
@@ -499,7 +501,7 @@ int simulate_client_or_single_player(bool is_client) {
 
 		int n = recv(socket_read, mem_pool, sizeof(mem_pool), 0);
 
-		set_world_state(mem_pool + 1);
+		set_world_state(std::string(mem_pool + 1, n - 1));
 
 		mem_pool[0] = '\0';
 	}
@@ -564,7 +566,7 @@ int simulate_client_or_single_player(bool is_client) {
 
 					continue;
 				}
-				set_world_state(mem_pool + 1);
+				set_world_state(std::string(mem_pool + 1, n - 1));
 
 				mem_pool[0] = '\0';
 
@@ -621,8 +623,6 @@ int simulate_client_or_single_player(bool is_client) {
 }
 
 int simulate_server() {
-
-	std::cout << "Запуск сервера...\n\n";
 
 	WSADATA wsaData;
 	{
@@ -734,8 +734,6 @@ int simulate_server() {
 			int ready = select(max_fd + 1, &rfds, NULL, NULL, NULL);
 
 			if (ready > 0) {
-
-				std::cout << "ready is true:\n";
 
 				if (FD_ISSET(Socket, &rfds)) {
 
@@ -891,15 +889,14 @@ int simulate_server() {
 
 	// send world_state
 	{
-		u32 len;
-		auto world_state = get_world_state(&len);
+		auto world_state = get_world_state();
+
+		std::cout << "world_state size = " << world_state.size() << "\n";
 
 		// send inform to clients
 		for (auto& client : Clients) {
-			send(client.socket_write, world_state, len, 0);
+			send(client.socket_write, world_state.c_str(), world_state.size(), 0);
 		}
-
-		delete[] world_state;
 	}
 
 	point_t delta_time = 0;
@@ -929,15 +926,14 @@ int simulate_server() {
 
 		simulate_physics(delta_time);
 
-		u32 len;
-		auto world_state = get_world_state(&len);
+		auto world_state = get_world_state();
 
 		// send world state to clients
 		for(int i = 0; i < Clients.size(); i++) {
 
 			auto& client = Clients[i];
 
-			if (send(client.socket_write, world_state, len, 0) == SOCKET_ERROR) {
+			if (send(client.socket_write, world_state.c_str(), world_state.size(), 0) == SOCKET_ERROR) {
 
 				printf("Клиент %s::%d disconnected\n", client.ip.c_str(), client.socket_write);
 
@@ -953,7 +949,7 @@ int simulate_server() {
 		if (world_state[0] == 't') {
 			std::cout << "У нас есть победитель: ";
 			world_state[0] = '\0';
-			printf("%s", world_state + 1);
+			printf("%s", world_state.c_str() + 1);
 			std::cout << "\n";
 
 			closesocket(Socket);
@@ -961,8 +957,6 @@ int simulate_server() {
 
 			return 0;
 		}
-
-		delete[] world_state;
 
 		update_delta_time();
 	}
@@ -998,3 +992,4 @@ int main() {
 
 	return 0;
 }
+

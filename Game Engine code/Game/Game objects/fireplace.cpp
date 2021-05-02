@@ -23,22 +23,6 @@ struct Fireplace {
 		pos = p;
 		fire = Fire_machine(pos, 5, 0.5, 0.5, 4, 0.15);
 	}
-	Fireplace(const char* memory) {
-		
-#define read(obj, type)\
-obj = *reinterpret_cast<const type*>(memory);\
-memory += sizeof(type);
-
-		read(pos, dot);
-
-		fire = Fire_machine(memory);
-		memory += fire.get_mem_len();
-
-		read(time, point_t);
-		read(cooldown_add_time_accum, point_t);
-
-#undef write
-	}
 
 	collision_circle get_collision() const {
 		return Circle(pos + dot(0, -10) * FIREPLACE_SIZE, FIREPLACE_COLLISION_RADIUS);
@@ -86,33 +70,17 @@ memory += sizeof(type);
 		draw_collision_obj(*this);
 	}
 
-	u32 get_mem_len() {
-		u32 res = fire.get_mem_len();
-		
-		res += sizeof(pos);
-
-		res += sizeof(time);
-		res += sizeof(cooldown_add_time_accum);
-
-		return res;
+	void serialize(std::ostream& os) const {
+		byte_serialization(os, pos);
+		fire.serialize(os);
+		byte_serialization(os, time);
+		byte_serialization(os, cooldown_add_time_accum);
 	}
-
-	// заполняет указатель данной структурой
-	void fill_mem(char* memory) {
-
-#define write(obj, type)\
-*reinterpret_cast<type*>(memory) = obj;\
-memory += sizeof(type);
-
-		write(pos, dot);
-
-		fire.fill_mem(memory);
-		memory += fire.get_mem_len();
-
-		write(time, point_t);
-		write(cooldown_add_time_accum, point_t);
-
-#undef write
+	void deserialize(std::istream& is) {
+		pos = byte_deserialization<dot>(is);
+		fire.deserialize(is);
+		time = byte_deserialization<point_t>(is);
+		cooldown_add_time_accum = byte_deserialization<point_t>(is);
 	}
 };
 

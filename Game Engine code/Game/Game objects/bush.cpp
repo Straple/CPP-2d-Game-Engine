@@ -10,6 +10,8 @@
 struct Bush {
 	dot pos;
 
+	serialization_traits_byte(Bush);
+
 	Bush(dot pos) {
 		this->pos = pos - BUSH_DELTA_DRAW_POS;
 	}

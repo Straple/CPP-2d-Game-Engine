@@ -7,6 +7,8 @@ struct Tree {
 
 	inline static const point_t collision_radius = 5;
 
+	serialization_traits_byte(Tree);
+
 	dot pos;
 
 	s16 hp = gobj_state.hp;

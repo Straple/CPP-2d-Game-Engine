@@ -16,6 +16,8 @@ struct Slime {
 
 	inline static const enemy_state enemy_state = enemy_state(100, 3, 30, 40, 8, 250, 0.3, 3, 2, 3);
 
+	serialization_traits_byte(Slime);
+
 	// pos and move
 	dot pos;
 	dot dp;

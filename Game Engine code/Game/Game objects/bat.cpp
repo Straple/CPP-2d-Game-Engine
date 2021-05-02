@@ -8,6 +8,8 @@ struct Bat {
 
 	inline static const enemy_state enemy_state = enemy_state(50, 3.5, 40, 50, 8, 300, 0.3, 5, 3, 4.5);
 
+	serialization_traits_byte(Bat);
+
 	// pos and move
 	dot pos;
 	dot dp;

@@ -36,83 +36,44 @@ struct Fire_machine {
 		this->mult_color_dec = mult_color_dec;
 		this->time_color_dec = time_color_dec;
 	}
-	Fire_machine(const char* memory) {
-
-#define read(obj, type)\
-obj = *reinterpret_cast<const type*>(memory);\
-memory += sizeof(type);
-
-
-		read(pos, dot);
-		read(size, point_t);
-
-		read(cooldown_add, point_t);
-		read(mult_size_dec, point_t);
-		read(mult_color_dec, point_t);
-		read(time_color_dec, point_t);
-
-		read(cooldown_add_accum, point_t);
-
-		Rhombus.resize(*reinterpret_cast<const u32*>(memory));
-		memory += sizeof(u32);
-
-		for (u32 i = 0; i < Rhombus.size(); i++) {
-			Rhombus[i] = reinterpret_cast<const rhombus*>(memory)[i];
-		}
-
-#undef write
-	}
 
 	struct rhombus {
 		dot pos;
 		point_t dpy;
 		point_t time;
 		bool is_smoke;
+
+		serialization_traits_byte(rhombus);
 	};
 
 	std::vector<rhombus> Rhombus;
 
-	u32 get_mem_len() {
-		u32 res = sizeof(rhombus) * Rhombus.size();
-		res += sizeof(u32);
+	void serialize(std::ostream& os) const {
+		byte_serialization(os, pos);
+		byte_serialization(os, size);
 
-		res += sizeof(pos);
-		res += sizeof(size);
+		byte_serialization(os, cooldown_add);
+		byte_serialization(os, mult_size_dec);
+		byte_serialization(os, mult_color_dec);
+		byte_serialization(os, time_color_dec);
 
-		res += sizeof(cooldown_add);
-		res += sizeof(mult_size_dec);
-		res += sizeof(mult_color_dec);
-		res += sizeof(time_color_dec);
+		byte_serialization(os, cooldown_add_accum);
 
-		res += sizeof(cooldown_add_accum);
+		serialization_traits<std::vector<rhombus>>::serialize(os, Rhombus);
 
-		return res;
 	}
+	void deserialize(std::istream& is) {
+		pos = byte_deserialization<dot>(is);
+		size = byte_deserialization<point_t>(is);
 
-	// заполняет указатель данной структурой
-	void fill_mem(char* memory) {
+		cooldown_add = byte_deserialization<point_t>(is);
+		mult_size_dec = byte_deserialization<point_t>(is);
+		mult_color_dec = byte_deserialization<point_t>(is);
+		time_color_dec = byte_deserialization<point_t>(is);
 
-#define write(obj, type)\
-*reinterpret_cast<type*>(memory) = obj;\
-memory += sizeof(type);
+		cooldown_add_accum = byte_deserialization<point_t>(is);
 
-		write(pos, dot);
-		write(size, point_t);
-
-		write(cooldown_add, point_t);
-		write(mult_size_dec, point_t);
-		write(mult_color_dec, point_t);
-		write(time_color_dec, point_t);
-
-		write(cooldown_add_accum, point_t);
-
-		write(Rhombus.size(), u32);
-
-		for (u32 i = 0; i < Rhombus.size(); i++) {
-			reinterpret_cast<rhombus*>(memory)[i] = Rhombus[i];
-		}
-
-#undef write
+		Rhombus = serialization_traits<std::vector<rhombus>>::deserialize(is);
 	}
 
 

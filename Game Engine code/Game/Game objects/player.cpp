@@ -87,6 +87,8 @@ struct Player {
 
 	inline static const game_object_state gobj_state = game_object_state(200, 10, 0.5);
 
+	serialization_traits_byte(Player);
+
 	// move and pos
 	dot pos;
 	dot dp;

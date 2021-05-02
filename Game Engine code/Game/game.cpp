@@ -28,15 +28,12 @@ std::vector<Fireplace> Fireplaces = {
 // Trees
 // Bushes
 // Logs
-// 
 // Fireplaces
+// 
 // Effects
 
-// Для каждого вектора нужно в начале поставить число 32битное = колву элементов
+std::string get_world_state() {
 
-char* get_world_state(u32* len) {
-
-	
 	for (auto& player : Players) {
 		if (player.lvl >= 20) {
 			char* memory = new char[sizeof(player.name) + 1];
@@ -50,101 +47,44 @@ char* get_world_state(u32* len) {
 		}
 	}
 
+	std::ostringstream oss(std::ios::binary);
 
-	*len = sizeof(u32) * 8 + 1;
-	{
-		*len += Players.size() * sizeof(Player);
-		
-		*len += Slimes.size() * sizeof(Slime);
-		*len += Bats.size() * sizeof(Bat);
+	oss << "f";
 
-		*len += Trees.size() * sizeof(Tree);
-		*len += Bushes.size() * sizeof(Bush);
-		*len += Logs.size() * sizeof(Log);
+	serialization_traits<std::vector<Player>>::serialize(oss, Players);
 
-		*len += Effects.size() * sizeof(effect);
+	serialization_traits<std::vector<Slime>>::serialize(oss, Slimes);
+	serialization_traits<std::vector<Bat>>::serialize(oss, Bats);
 
-		for (auto& fireplace : Fireplaces) {
-			*len += fireplace.get_mem_len();
-		}
-	}
+	serialization_traits<std::vector<Tree>>::serialize(oss, Trees);
+	serialization_traits<std::vector<Bush>>::serialize(oss, Bushes);
+	serialization_traits<std::vector<Log>>::serialize(oss, Logs);
+	serialization_traits<std::vector<Fireplace>>::serialize(oss, Fireplaces);
 
-	char* memory = new char[*len];
+	serialization_traits<std::vector<effect>>::serialize(oss, Effects);
 
-	memory[0] = 'f'; // no winners
-	char* ptr = memory + 1;
-	
-#define write(Container, type)\
-*reinterpret_cast<u32*>(ptr) = Container.size();\
-ptr += sizeof(u32);\
-for (u32 i = 0; i < Container.size(); i++) {\
-	reinterpret_cast<type*>(ptr)[i] = Container[i];\
-}\
-ptr += sizeof(type) * Container.size();
-	
-	write(Players, Player);
-
-	write(Slimes, Slime);
-	write(Bats, Bat);
-
-	write(Trees, Tree);
-	write(Bushes, Bush);
-	write(Logs, Log);
-
-	write(Effects, effect);
-
-	// Fireplaces
-	{
-		*reinterpret_cast<u32*>(ptr) = Fireplaces.size();
-		ptr += sizeof(u32);
-		for (u32 i = 0; i < Fireplaces.size(); i++) {
-			Fireplaces[i].fill_mem(ptr);
-			ptr += Fireplaces[i].get_mem_len();
-		}
-	}
-
-#undef write
-
-	return memory;
+	return oss.str();
 }
 
-void set_world_state(char* ptr) {
+void set_world_state(std::string s) {
 
-#define read(Container, type)\
-len = *reinterpret_cast<u32*>(ptr);\
-ptr += sizeof(u32);\
-Container.resize(len);\
-for (u32 i = 0; i < len; i++) {\
-	Container[i] = *reinterpret_cast<type*>(ptr);\
-	ptr += sizeof(type);\
-}
+	// ERROR HERE!
+	
+	std::istringstream iss(s);
 
-	u32 len;
+	std::string af = iss.str();
 
-	read(Players, Player);
+	Players = serialization_traits<std::vector<Player>>::deserialize(iss);
 
-	read(Slimes, Slime);
-	read(Bats, Bat);
+	Slimes = serialization_traits<std::vector<Slime>>::deserialize(iss);
+	Bats = serialization_traits<std::vector<Bat>>::deserialize(iss);
 
-	read(Trees, Tree);
-	read(Bushes, Bush);
-	read(Logs, Log);
+	Trees = serialization_traits<std::vector<Tree>>::deserialize(iss);
+	Bushes = serialization_traits<std::vector<Bush>>::deserialize(iss);
+	Logs = serialization_traits<std::vector<Log>>::deserialize(iss);
+	Fireplaces = serialization_traits<std::vector<Fireplace>>::deserialize(iss);
 
-	read(Effects, effect);
-
-	// Fireplaces
-	{
-		len = *reinterpret_cast<u32*>(ptr);
-		ptr += sizeof(u32);
-
-		Fireplaces.resize(len);
-		for (u32 i = 0; i < len; i++) {
-			Fireplaces[i] = ptr;
-			ptr += Fireplaces[i].get_mem_len();
-		}
-	}
-
-#undef read
+	Effects = serialization_traits<std::vector<effect>>::deserialize(iss);
 }
 
 #include "game_collision.cpp"
@@ -595,7 +535,7 @@ void simulate_input(const Input& input, func_t&& window_mode_callback) {
 		window_mode_callback();
 	}
 
-	if (pressed(BUTTON_TAB)) {
+	/*if (pressed(BUTTON_TAB)) {
 		eng_state.flip(DEBUG);
 	}
 
@@ -605,10 +545,10 @@ void simulate_input(const Input& input, func_t&& window_mode_callback) {
 
 	if (pressed(BUTTON_F)) {
 		eng_state.flip(FPS_VIS);
-	}
+	}*/
 
 	// update render_scale
-	{
+	/*{
 		if (is_down(BUTTON_UP)) {
 
 			point_t pt_x = (mouse.pos.x + arena_half_size.x) * scale_factor;
@@ -645,7 +585,7 @@ void simulate_input(const Input& input, func_t&& window_mode_callback) {
 			mouse.pos = dot(pt_x, pt_y)
 				/ scale_factor - arena_half_size;
 		}
-	}
+	}*/
 
 	mouse.simulate(input);
 }

@@ -4,6 +4,8 @@ struct effect {
 
 	animation anim;
 
+	serialization_traits_byte(effect);
+
 	effect() {}
 
 	effect(const dot& pos, const animation& anim) {
