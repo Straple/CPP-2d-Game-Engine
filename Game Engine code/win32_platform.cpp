@@ -1,4 +1,6 @@
-﻿/*			
+﻿#define GAME_ENGINE_TAG "lunar oblivion engine v1.0"
+
+/*			
 
 
 										+------+
@@ -611,6 +613,8 @@ int simulate_client_or_single_player(bool is_client) {
 
 		// render screen
 		{
+			draw_text(GAME_ENGINE_TAG, dot(arena_half_size.x - 50, -arena_half_size.y + 5), 0.33, WHITE);
+
 			StretchDIBits(hdc, 0, 0, render_state.width, render_state.height,
 				0, 0, render_state.width, render_state.height,
 				reinterpret_cast<void*>(render_state.render_memory), &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
